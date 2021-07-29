@@ -1,0 +1,76 @@
+<?php
+
+function getDataDir()
+{
+    $dir = scandir(baseDir);
+    foreach ($dir as $value) {
+        if (strlen($value) == 21 && is_dir(baseDir . "/$value") && substr($value, 0, 5) == "data_") {
+            return baseDir . "/$value";
+        }
+    }
+    $dir = baseDir . "/data_" . str_rand(16);
+    mkdir($dir);
+    return $dir;
+}
+
+function getConfig($configFile)
+{
+    $file = dataDir . "/$configFile.json";
+    if (!file_exists($file)) {
+        saveFile($file, "[]");
+        return array();
+    }
+    $config = file_get_contents($file);
+    $config = json_decode($config, true);
+    if ($config === null) $config = array();
+    return $config;
+}
+
+function saveConfig($configFile, $config)
+{
+    $file = dataDir . "/$configFile.json";
+    return saveFile($file, json_encode($config));
+}
+
+/**
+ * 保存文件
+ *
+ * @param string $fileName 文件名（含相对路径）
+ * @param string $text 文件内容
+ * @return boolean
+ */
+function saveFile($fileName, $text)
+{
+    if (!$fileName || !$text)
+        return false;
+    if (makeDir(dirname($fileName))) {
+        if ($fp = fopen($fileName, "w")) {
+            if (@fwrite($fp, $text)) {
+                fclose($fp);
+                return true;
+            } else {
+                fclose($fp);
+                return false;
+            }
+        }
+    }
+    return false;
+}
+/**
+ * 连续创建目录
+ *
+ * @param string $dir 目录字符串
+ * @param int $mode 权限数字
+ * @return boolean
+ */
+function makeDir($dir, $mode = 0755)
+{
+    /*function makeDir($dir, $mode="0777") { 此外0777不能加单引号和双引号，
+	 加了以后，"0400" = 600权限，处以为会这样，我也想不通*/
+    if (empty($dir)) return false;
+    if (!file_exists($dir)) {
+        return mkdir($dir, $mode, true);
+    } else {
+        return true;
+    }
+}
