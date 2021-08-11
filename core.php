@@ -172,9 +172,3 @@ function getPar($name, $default = '', $strtolower = false)
     $value = $strtolower ? strtolower($value) : $value;
     return $value;
 }
-
-{
-    $fileName = baseDir . "/logs/$logfilename.log";
-    makeDir(dirname($fileName));
-    file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . "]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
-}
