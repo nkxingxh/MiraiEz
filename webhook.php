@@ -3,6 +3,7 @@ require_once "core.php";
 header('content-type: application/json');
 
 $_DATA = json_decode(file_get_contents("php://input"), true);
+saveFile('webhook.log', file_get_contents("php://input"));
 
 if (!empty(Authorization) && (empty($_SERVER['HTTP_AUTHORIZATION']) || $_SERVER['HTTP_AUTHORIZATION'] != Authorization)) {
     header('HTTP/1.1 403 Forbidden');
