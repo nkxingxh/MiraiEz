@@ -1,6 +1,6 @@
 <?php
 
-function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(), $UserAgent = '')
+function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(), $UserAgent = 'miraiez')
 {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -33,7 +33,7 @@ function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(
     return $response;
 }
 
-function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = '')
+function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -66,7 +66,7 @@ function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array()
     return $response;
 }
 
-function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
+function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -95,7 +95,7 @@ function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $set
     return $response;
 }
 
-function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
+function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -124,7 +124,7 @@ function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $s
     return $response;
 }
 
-function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
+function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -153,7 +153,7 @@ function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $
     return $response;
 }
 
-function Curl($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36')
+function Curl($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
