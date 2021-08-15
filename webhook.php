@@ -33,7 +33,7 @@ $pluginsDir = "$baseDir/plugins";
 define("pluginsDir", $pluginsDir);
 
 $plugins = array();
-hookRegister('checkUpdates', 'BotOnlineEvent');
+hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');
 
 foreach ($_loadPlugins as $__plugin__) {
     include "./plugins/$__plugin__";
@@ -67,12 +67,19 @@ function hookRegister($func, ...$types)
     }
 }
 
-function checkUpdates()
+function checkUpdates($_DATA)
 {
+    if ($_DATA['type'] == 'FriendMessage' && $_DATA['sender']['id'] == admin_qq) {
+        global $_PlainText;
+        if ($_PlainText != '检查更新') return;
+    }
     $url = "https://api.github.com/repos/nkxingxh/miraiez/releases/latest";
     $resp = CurlGET($url);
     $resp = json_decode($resp, true);
-    if (empty($resp)) return false;
+    if (empty($resp)) {
+        if ($_DATA['type'] == 'FriendMessage') sendFriendMessage(admin_qq, "miraiez 获取最新版本失败");
+        return false;
+    }
     if (compareVersions(version, $resp['tag_name']) == '<')
         sendFriendMessage(admin_qq, "miraiez 发现新版本！\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
 }
