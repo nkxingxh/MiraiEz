@@ -10,100 +10,33 @@ require_once "$baseDir/pluginsHelp.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-
-/**
- * 发送好友消息
- */
-function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
-{
-    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
-    $content =  array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
-    if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendFriendMessage', $content);
-}
-
-/**
- * 发送群消息
- */
-function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
-{
-    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
-    $content = array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
-    if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendGroupMessage', $content);
-}
-
-/**
- * 发送临时会话消息
- */
-function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '')
-{
-    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
-    $content = array('sessionKey' => $sessionKey, 'qq' => $qq, 'group' => $group, 'messageChain' => $messageChain);
-    if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendTempMessage', $content);
-}
-
-/**
- * 撤回消息
- */
-function recall($target, $sessionKey = '')
-{
-    autoAdapter('recall', array('sessionKey' => $sessionKey, 'target' => $target));
-}
-
-function groupList($sessionKey = '')
-{
-    return HttpAdapter('groupList', array('sessionKey' => $sessionKey));
-}
-
-/**
- * 处理 添加好友申请 事件
- * @see https://github.com/project-mirai/mirai-api-http/blob/master/docs/api/API.md#添加好友申请
- */
-function resp_newFriendRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
-{
-    autoAdapter('resp_newFriendRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
-}
-
-/**
- * 处理 用户入群申请 事件
- */
-function resp_memberJoinRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
-{
-    autoAdapter('resp_memberJoinRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
-}
-
-/**
- * 处理 Bot被邀请入群申请 事件
- */
-function resp_botInvitedJoinGroupRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
-{
-    autoAdapter('resp_botInvitedJoinGroupRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
-}
+define("version", '1.1.0');
 
 /**
  * 自动接口适配器
- * 方便使用 webhook 适配器，同时为以后使用 http 适配器做铺垫
+ * 自动调用对应接口执行命令
  */
 function autoAdapter($command = '', $content = array())
 {
     global $webhooked;
+    //可以使用 webhook 的命令
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
     $USE_HTTP = $webhooked || (!in_array($command, $WEBHOOK_FUNC));
 
     if ($USE_HTTP) {
         $command = str_replace('_', '/', $command);     //命令格式转换
-        HttpAdapter($command, $content);
+        return HttpAdapter($command, $content);
     } else {
         $command = str_replace('/', '_', $command);     //命令格式转换
         echo json_encode(array('command' => $command, 'content' => $content));
         $webhooked = true;
+        return array('code' => 200, 'msg' => 'OK');
     }
 }
 
 function HttpAdapter($command, $content = array())
 {
+    //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
     if (webhook && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
@@ -163,12 +96,156 @@ function HttpAdapter_release($sessionKey, $qq)
 }
 
 /**
- * 获取 HTTP 参数
- * 支持 GET 和 POST
+ * 发送好友消息
  */
-function getPar($name, $default = '', $strtolower = false)
+function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 {
-    $value = empty($_POST[$name]) ? (empty($_GET[$name]) ? $default : $_GET[$name]) : $_POST[$name];
-    $value = $strtolower ? strtolower($value) : $value;
-    return $value;
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
+    $content =  array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
+    if (!empty($quote)) $content['quote'] = $quote;
+    autoAdapter('sendFriendMessage', $content);
+}
+
+/**
+ * 发送群消息
+ */
+function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
+{
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
+    $content = array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
+    if (!empty($quote)) $content['quote'] = $quote;
+    autoAdapter('sendGroupMessage', $content);
+}
+
+/**
+ * 发送临时会话消息
+ */
+function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '')
+{
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
+    $content = array('sessionKey' => $sessionKey, 'qq' => $qq, 'group' => $group, 'messageChain' => $messageChain);
+    if (!empty($quote)) $content['quote'] = $quote;
+    autoAdapter('sendTempMessage', $content);
+}
+
+/**
+ * 撤回消息
+ * @param int|bool $target  目标消息ID，当值为 TRUE 时则表示当前接收的消息
+ */
+function recall($target = true, $sessionKey = '')
+{
+    if ($target === true) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['messageChain'][0]['id'];
+        else return false;
+    } else $target = (int) $target;
+    autoAdapter('recall', array('sessionKey' => $sessionKey, 'target' => $target));
+}
+
+function groupList($sessionKey = '')
+{
+    return HttpAdapter('groupList', array('sessionKey' => $sessionKey));
+}
+
+/**
+ * 处理 添加好友申请 事件
+ * @see https://github.com/project-mirai/mirai-api-http/blob/master/docs/api/API.md#添加好友申请
+ */
+function resp_newFriendRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+{
+    autoAdapter('resp_newFriendRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+}
+
+/**
+ * 处理 用户入群申请 事件
+ */
+function resp_memberJoinRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+{
+    autoAdapter('resp_memberJoinRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+}
+
+/**
+ * 处理 Bot被邀请入群申请 事件
+ */
+function resp_botInvitedJoinGroupRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+{
+    autoAdapter('resp_botInvitedJoinGroupRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+}
+
+/**
+ * 获取文件信息
+ */
+function file_info($id = true, $target = null, $group = null, $qq = null, $withDownloadInfo = false, $sessionKey = '')
+{
+    if ($id === true) {
+        $id = messageChain2FileId();
+        if ($id === false) return false;
+    }
+    return autoAdapter(__FUNCTION__, array(
+        'id' => $id,
+        'target' => $target,
+        'group' => $group,
+        'qq' => $qq,
+        'withDownloadInfo' => $withDownloadInfo,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+function file_mkdir($id, $directoryName, $target = null, $group = null, $qq = null, $sessionKey = '')
+{
+    return autoAdapter(__FUNCTION__, array(
+        'id' => $id,
+        'directoryName' => $directoryName,
+        'target' => $target,
+        'group' => $group,
+        'qq' => $qq,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+function file_delete($id = true, $target = null, $group = null, $qq = null, $sessionKey = '')
+{
+    if ($id === true) {
+        $id = messageChain2FileId();
+        if ($id === false) return false;
+    }
+    return autoAdapter(__FUNCTION__, array(
+        'id' => $id,
+        'target' => $target,
+        'group' => $group,
+        'qq' => $qq,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+function file_move($id = true, $moveTo = null, $target = null, $group = null, $qq = null, $sessionKey = '')
+{
+    if ($id === true) {
+        $id = messageChain2FileId();
+        if ($id === false) return false;
+    }
+    return autoAdapter(__FUNCTION__, array(
+        'id' => $id,
+        'moveTo' => $moveTo,
+        'target' => $target,
+        'group' => $group,
+        'qq' => $qq,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+function file_rename($id = true, $renameTo = null, $target = null, $group = null, $qq = null, $sessionKey = '')
+{
+    if ($id === true) {
+        $id = messageChain2FileId();
+        if ($id === false) return false;
+    }
+    return autoAdapter(__FUNCTION__, array(
+        'id' => $id,
+        'renameTo' => $renameTo,
+        'target' => $target,
+        'group' => $group,
+        'qq' => $qq,
+        'sessionKey' => $sessionKey
+    ));
 }

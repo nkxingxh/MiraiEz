@@ -20,7 +20,7 @@ function getGroupPermission($groupID, $sessionKey = '')
 /**
  * 获取消息链中的文本
  */
-function messageChain2PlainText($messageChain = '')
+function messageChain2PlainText($messageChain = null)
 {
     if (empty($messageChain) && webhook) {
         global $_DATA;
@@ -40,7 +40,7 @@ function messageChain2PlainText($messageChain = '')
  * 获取消息链中的图片 Url
  * 返回 Url 数组
  */
-function messageChain2ImageUrl($messageChain = '')
+function messageChain2ImageUrl($messageChain = null)
 {
     if (empty($messageChain) && webhook) {
         global $_DATA;
@@ -60,7 +60,7 @@ function messageChain2ImageUrl($messageChain = '')
  * 获取消息链中的 At
  * 返回数组
  */
-function messageChain2At($messageChain = '')
+function messageChain2At($messageChain = null)
 {
     if (empty($messageChain) && webhook) {
         global $_DATA;
@@ -80,7 +80,7 @@ function messageChain2At($messageChain = '')
  * 获取消息链中的 Voice URL
  * 返回数组
  */
-function messageChain2Voice($messageChain = '')
+function messageChain2Voice($messageChain = null)
 {
     if (empty($messageChain) && webhook) {
         global $_DATA;
@@ -98,9 +98,9 @@ function messageChain2Voice($messageChain = '')
 
 
 /**
- * 获取消息链中的引用消息，返回 Quote
+ * 获取消息链中的引用消息，返回 Quote，无引用返回 false
  */
-function messageChain2Quote($messageChain = '')
+function messageChain2Quote($messageChain = null)
 {
     if (empty($messageChain) && webhook) {
         global $_DATA;
@@ -111,7 +111,29 @@ function messageChain2Quote($messageChain = '')
             return $value;
         }
     }
-    return null;
+    return false;
+}
+
+/**
+ * 获取消息链中的文件信息，返回 FileID，无文件返回 false
+ */
+function messageChain2FileId($messageChain = null)
+{
+    if (empty($messageChain) && webhook) {
+        global $_DATA;
+        $messageChain = $_DATA['messageChain'];
+    }
+    if (isMessage($_DATA['type'])) {
+        //这里不需要考虑消息顺序，故使用 foreach 效率较高
+        foreach ($messageChain as $value) {
+            if ($value['type'] == 'File') {
+                $id = $value['id'];
+                break;
+            }
+        }
+        if ($id === true) return false;
+    } else return false;
+    return $id;
 }
 
 /**
@@ -276,7 +298,7 @@ function getImageType($image)
     if (!file_put_contents($filename, $image)) return false;
     $imginfo = getimagesize($filename);
     unlink($filename);
-    if($imginfo === false) return false;
+    if ($imginfo === false) return false;
     $ext = CutStr_Right($imginfo['mime'], '/');
     if ($ext == 'jpeg') $ext = 'jpg';
     return $ext;
@@ -338,13 +360,13 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
     imagedestroy($image_wp);
     imagedestroy($image);
     unlink($imgsrc);
-    
+
     if ($result) {
         $d = file_get_contents($imgdst);
         unlink($imgdst);
 
         //防止越压越大, 亲身经历
-        if(strlen($d) < strlen($OriginImage)) return $d;
+        if (strlen($d) < strlen($OriginImage)) return $d;
         else return $OriginImage;
     } else {
         return false;
