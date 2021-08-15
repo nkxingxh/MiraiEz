@@ -69,10 +69,11 @@ function hookRegister($func, ...$types)
 
 function checkUpdates($_DATA)
 {
-    if ($_DATA['type'] == 'FriendMessage' && $_DATA['sender']['id'] == admin_qq) {
-        global $_PlainText;
-        if ($_PlainText != '检查更新') return;
-    }
+    if ($_DATA['type'] == 'FriendMessage')
+        if ($_DATA['sender']['id'] == admin_qq) {
+            global $_PlainText;
+            if ($_PlainText != '检查更新') return;
+        } else return;
     $url = "https://api.github.com/repos/nkxingxh/miraiez/releases/latest";
     $resp = CurlGET($url);
     $resp = json_decode($resp, true);
