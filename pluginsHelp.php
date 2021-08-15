@@ -1,5 +1,12 @@
 <?php
 
+function writeLog($content, $module = '', $logfilename = 'core')
+{
+    $fileName = baseDir . "/logs/$logfilename.log";
+    makeDir(dirname($fileName));
+    file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . "]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
+}
+
 function getDataDir()
 {
     $dir = scandir(baseDir);
