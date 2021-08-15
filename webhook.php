@@ -32,7 +32,8 @@ $_loadPlugins = array(
 $pluginsDir = "$baseDir/plugins";
 define("pluginsDir", $pluginsDir);
 
-$plugins = array();                         //插件列表
+$plugins = array();
+hookRegister('checkUpdates', 'BotOnlineEvent');
 
 foreach ($_loadPlugins as $__plugin__) {
     include "./plugins/$__plugin__";
@@ -63,5 +64,28 @@ function hookRegister($func, ...$types)
             }
             break;
         }
+    }
+}
+
+function checkUpdates()
+{
+    $url = "https://api.github.com/repos/nkxingxh/miraiez/releases/latest";
+    $resp = CurlGET($url);
+    $resp = json_decode($resp, true);
+    if (empty($resp)) return false;
+    if (compareVersions(version, $resp['tag_name']) == '<')
+        sendFriendMessage(admin_qq, "miraiez 发现新版本！\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
+}
+
+function compareVersions($ver1, $ver2)
+{
+    $verNums1 = (strpos($ver1, '.') === false) ? array($ver1) : explode('.', $ver1);
+    $verNums2 = (strpos($ver2, '.') === false) ? array($ver2) : explode('.', $ver2);
+    if ((int) $verNums1[0] > (int) $verNums2[0]) return '>';
+    elseif ((int)$verNums1[0] < (int)$verNums2[0]) return '<';
+    else {
+        $ver1 = substr($ver1, strpos($ver1, '.') + 1);
+        $ver2 = substr($ver2, strpos($ver2, '.') + 1);
+        return compareVersions($ver1, $ver2);
     }
 }

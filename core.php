@@ -10,7 +10,7 @@ require_once "$baseDir/pluginsHelp.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '1.1.0');
+define("version", '1.1.1');
 
 /**
  * 自动接口适配器
