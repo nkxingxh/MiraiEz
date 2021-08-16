@@ -103,7 +103,7 @@ function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     $content =  array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
     if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendFriendMessage', $content);
+    return autoAdapter('sendFriendMessage', $content);
 }
 
 /**
@@ -114,7 +114,7 @@ function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
     $content = array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
     if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendGroupMessage', $content);
+    return autoAdapter('sendGroupMessage', $content);
 }
 
 /**
@@ -125,7 +125,7 @@ function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
     $content = array('sessionKey' => $sessionKey, 'qq' => $qq, 'group' => $group, 'messageChain' => $messageChain);
     if (!empty($quote)) $content['quote'] = $quote;
-    autoAdapter('sendTempMessage', $content);
+    return autoAdapter('sendTempMessage', $content);
 }
 
 /**
@@ -139,7 +139,7 @@ function recall($target = true, $sessionKey = '')
         if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['messageChain'][0]['id'];
         else return false;
     } else $target = (int) $target;
-    autoAdapter('recall', array('sessionKey' => $sessionKey, 'target' => $target));
+    return autoAdapter('recall', array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
 function groupList($sessionKey = '')
@@ -153,7 +153,7 @@ function groupList($sessionKey = '')
  */
 function resp_newFriendRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
 {
-    autoAdapter('resp_newFriendRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    return autoAdapter('resp_newFriendRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
 }
 
 /**
@@ -161,7 +161,7 @@ function resp_newFriendRequestEvent($eventId, $fromId, $groupId, $operate, $mess
  */
 function resp_memberJoinRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
 {
-    autoAdapter('resp_memberJoinRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    return autoAdapter('resp_memberJoinRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
 }
 
 /**
@@ -169,7 +169,7 @@ function resp_memberJoinRequestEvent($eventId, $fromId, $groupId, $operate, $mes
  */
 function resp_botInvitedJoinGroupRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
 {
-    autoAdapter('resp_botInvitedJoinGroupRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    return autoAdapter('resp_botInvitedJoinGroupRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
 }
 
 /**
