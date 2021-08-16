@@ -82,7 +82,8 @@ function checkUpdates($_DATA)
         return false;
     }
     if (compareVersions(version, $resp['tag_name']) == '<')
-        sendFriendMessage(admin_qq, "miraiez 发现新版本！\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
+        sendFriendMessage(admin_qq, "miraiez 发现新版本\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
+    elseif($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
 }
 
 function compareVersions($ver1, $ver2)

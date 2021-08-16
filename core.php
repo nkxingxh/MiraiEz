@@ -55,10 +55,10 @@ function HttpAdapter($command, $content = array())
         $res = json_decode($res, true);
 
         if ($res['code'] == 3) {
-            $error++;
             $content['sessionKey'] = getSessionKey(bot, true);
         }
-    } while ($res['code'] == 3 && $error < 2);      //错误重试
+        $error++;
+    } while (($res === null || $res['code'] == 3) && $error < 2);      //错误重试
     return $res;
 }
 
