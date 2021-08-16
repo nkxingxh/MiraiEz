@@ -38,7 +38,8 @@ function HttpAdapter($command, $content = array())
 {
     //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
-    if (webhook && empty($content['sessionKey'])) {
+    //自动获取 sessionKey
+    if (!empty(bot) && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
     }
 
