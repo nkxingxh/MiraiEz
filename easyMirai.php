@@ -164,7 +164,7 @@ function replyMessage($messageChain, $quote = 0, $sessionKey = '')
 /**
  * 自动获取 SessionKey 并绑定 QQ
  */
-function getSessionKey($qq, $forceUpdateSessionKey = false)
+function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
 {
     $file = dataDir . "/session.json";
     if (!file_exists($file)) file_put_contents($file, "[]");
@@ -177,7 +177,8 @@ function getSessionKey($qq, $forceUpdateSessionKey = false)
 
     $n = count($session);
     for ($i = 0; $i < $n; $i++) {
-        if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq) {
+        if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq || empty($qq)) {
+            if(empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
             if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
                 $res = HttpAdapter_verify();
                 if ($res['code'] == 0) {

@@ -41,6 +41,8 @@ function HttpAdapter($command, $content = array())
     //自动获取 sessionKey
     if (!empty(bot) && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
+    } elseif (empty(webhook)) {
+        $content['sessionKey'] = getSessionKey();
     }
 
     $error = 0;
@@ -102,7 +104,11 @@ function HttpAdapter_release($sessionKey, $qq)
 function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 {
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
-    $content =  array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
+    $content =  array(
+        'sessionKey' => $sessionKey,
+        'target' => (int) $target,
+        'messageChain' => $messageChain
+    );
     if (!empty($quote)) $content['quote'] = $quote;
     return autoAdapter('sendFriendMessage', $content);
 }
@@ -113,7 +119,11 @@ function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 {
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
-    $content = array('sessionKey' => $sessionKey, 'target' => $target, 'messageChain' => $messageChain);
+    $content = array(
+        'sessionKey' => $sessionKey,
+        'target' => (int) $target,
+        'messageChain' => $messageChain
+    );
     if (!empty($quote)) $content['quote'] = $quote;
     return autoAdapter('sendGroupMessage', $content);
 }
@@ -124,7 +134,12 @@ function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '')
 {
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
-    $content = array('sessionKey' => $sessionKey, 'qq' => $qq, 'group' => $group, 'messageChain' => $messageChain);
+    $content = array(
+        'sessionKey' => $sessionKey,
+        'qq' => (int) $qq,
+        'group' => (int) $group,
+        'messageChain' => $messageChain
+    );
     if (!empty($quote)) $content['quote'] = $quote;
     return autoAdapter('sendTempMessage', $content);
 }
@@ -184,10 +199,10 @@ function file_info($id = true, $target = null, $group = null, $qq = null, $withD
     }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
-        'target' => $target,
-        'group' => $group,
-        'qq' => $qq,
-        'withDownloadInfo' => $withDownloadInfo,
+        'target' => ($target === null) ? null : ((int) $target),
+        'group' => ($group === null) ? null : ((int) $group),
+        'qq' => ($qq === null) ? null : ((int) $qq),
+        'withDownloadInfo' => (bool) $withDownloadInfo,
         'sessionKey' => $sessionKey
     ));
 }
@@ -197,9 +212,9 @@ function file_mkdir($id, $directoryName, $target = null, $group = null, $qq = nu
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'directoryName' => $directoryName,
-        'target' => $target,
-        'group' => $group,
-        'qq' => $qq,
+        'target' => ($target === null) ? null : ((int) $target),
+        'group' => ($group === null) ? null : ((int) $group),
+        'qq' => ($qq === null) ? null : ((int) $qq),
         'sessionKey' => $sessionKey
     ));
 }
@@ -212,9 +227,9 @@ function file_delete($id = true, $target = null, $group = null, $qq = null, $ses
     }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
-        'target' => $target,
-        'group' => $group,
-        'qq' => $qq,
+        'target' => ($target === null) ? null : ((int) $target),
+        'group' => ($group === null) ? null : ((int) $group),
+        'qq' => ($qq === null) ? null : ((int) $qq),
         'sessionKey' => $sessionKey
     ));
 }
@@ -228,9 +243,9 @@ function file_move($id = true, $moveTo = null, $target = null, $group = null, $q
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'moveTo' => $moveTo,
-        'target' => $target,
-        'group' => $group,
-        'qq' => $qq,
+        'target' => ($target === null) ? null : ((int) $target),
+        'group' => ($group === null) ? null : ((int) $group),
+        'qq' => ($qq === null) ? null : ((int) $qq),
         'sessionKey' => $sessionKey
     ));
 }
@@ -244,9 +259,9 @@ function file_rename($id = true, $renameTo = null, $target = null, $group = null
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'renameTo' => $renameTo,
-        'target' => $target,
-        'group' => $group,
-        'qq' => $qq,
+        'target' => ($target === null) ? null : ((int) $target),
+        'group' => ($group === null) ? null : ((int) $group),
+        'qq' => ($qq === null) ? null : ((int) $qq),
         'sessionKey' => $sessionKey
     ));
 }
