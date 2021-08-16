@@ -23,7 +23,7 @@ function autoAdapter($command = '', $content = array())
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
     $USE_HTTP = $webhooked || (!in_array($command, $WEBHOOK_FUNC));
 
-    if ($USE_HTTP) {
+    if ($USE_HTTP || empty(webhook)) {
         $command = str_replace('_', '/', $command);     //命令格式转换
         return HttpAdapter($command, $content);
     } else {
