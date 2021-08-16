@@ -22,7 +22,7 @@ function getGroupPermission($groupID, $sessionKey = '')
  */
 function messageChain2PlainText($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }
@@ -42,7 +42,7 @@ function messageChain2PlainText($messageChain = null)
  */
 function messageChain2ImageUrl($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }
@@ -62,7 +62,7 @@ function messageChain2ImageUrl($messageChain = null)
  */
 function messageChain2At($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }
@@ -82,7 +82,7 @@ function messageChain2At($messageChain = null)
  */
 function messageChain2Voice($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }
@@ -102,7 +102,7 @@ function messageChain2Voice($messageChain = null)
  */
 function messageChain2Quote($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }
@@ -119,7 +119,7 @@ function messageChain2Quote($messageChain = null)
  */
 function messageChain2FileId($messageChain = null)
 {
-    if (empty($messageChain) && webhook) {
+    if (empty($messageChain) && defined('webhook') && webhook) {
         global $_DATA;
         $messageChain = $_DATA['messageChain'];
     }

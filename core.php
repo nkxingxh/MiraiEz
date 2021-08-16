@@ -23,7 +23,7 @@ function autoAdapter($command = '', $content = array())
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
     $USE_HTTP = $webhooked || (!in_array($command, $WEBHOOK_FUNC));
 
-    if ($USE_HTTP || empty(webhook)) {
+    if ($USE_HTTP || defined('webhook') == false) {
         $command = str_replace('_', '/', $command);     //命令格式转换
         return HttpAdapter($command, $content);
     } else {
@@ -39,9 +39,9 @@ function HttpAdapter($command, $content = array())
     //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
     //自动获取 sessionKey
-    if (!empty(bot) && empty($content['sessionKey'])) {
+    if (defined('bot') && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
-    } elseif (empty(webhook)) {
+    } elseif (defined('webhook') == false) {
         $content['sessionKey'] = getSessionKey();
     }
 
@@ -58,7 +58,7 @@ function HttpAdapter($command, $content = array())
         $res = json_decode($res, true);
 
         if ($res['code'] == 3) {
-            $content['sessionKey'] = getSessionKey(bot, true);
+            $content['sessionKey'] = getSessionKey(defined('bot') ? bot : 0, true);
         }
         $error++;
     } while (($res === null || $res['code'] == 3) && $error < 2);      //错误重试
