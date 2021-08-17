@@ -5,7 +5,7 @@ header('content-type: application/json');
 $_DATA = json_decode(file_get_contents("php://input"), true);
 saveFile('webhook.log', file_get_contents("php://input"));
 
-if (!empty(Authorization) && (empty($_SERVER['HTTP_AUTHORIZATION']) || $_SERVER['HTTP_AUTHORIZATION'] != Authorization)) {
+if (!verifyAuthorization()) {
     header('HTTP/1.1 403 Forbidden');
     exit;
 }
@@ -83,7 +83,7 @@ function checkUpdates($_DATA)
     }
     if (compareVersions(version, $resp['tag_name']) == '<')
         sendFriendMessage(admin_qq, "miraiez 发现新版本\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
-    elseif($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
+    elseif ($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
 }
 
 function compareVersions($ver1, $ver2)
@@ -97,4 +97,11 @@ function compareVersions($ver1, $ver2)
         $ver2 = substr($ver2, strpos($ver2, '.') + 1);
         return compareVersions($ver1, $ver2);
     }
+}
+
+function verifyAuthorization()
+{
+    if (empty(Authorization)) return true;
+    if (empty($_SERVER['HTTP_AUTHORIZATION'])) return false;
+    return (('[' . Authorization . ']') == $_SERVER['HTTP_AUTHORIZATION']) || (Authorization == $_SERVER['HTTP_AUTHORIZATION']);
 }
