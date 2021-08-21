@@ -1,6 +1,6 @@
 # miraiez
 
-![](https://img.shields.io/github/license/cyanray/mirai-cpp.svg)
+![](https://img.shields.io/github/license/nkxingxh/miraiez.svg)
 
 ## 开始使用
 
@@ -19,6 +19,6 @@
 
 请查看 plugins 文件夹中的示例插件
 
-easyMirai.php 中的是核心函数
+core.php 中的是核心函数
 
-可以帮助你更快的编写插件
+easyMirai.php 中的函数则可以帮助你更快的编写插件
