@@ -42,7 +42,10 @@ unset($__plugin__);
 
 if (is_array($_HOOK)) {
     foreach ($_HOOK as $_FUNC) {
-        $_FUNC($_DATA);
+        $return_code = $_FUNC($_DATA);
+        if($return_code === 1) {    //返回值为 1 拦截
+            break;
+        }
     }
     unset($_FUNC);
 }
