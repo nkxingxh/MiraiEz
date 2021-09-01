@@ -1,16 +1,4 @@
 <?php
-$baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
-define('baseDir', $baseDir);            //定义站点目录
-
-require_once "$baseDir/config.php";
-require_once "$baseDir/string.php";
-require_once "$baseDir/curl.php";
-require_once "$baseDir/easyMirai.php";
-require_once "$baseDir/pluginsHelp.php";
-
-$dataDir = getDataDir();
-define("dataDir", $dataDir);
-define("version", '1.1.2');
 
 /**
  * 自动接口适配器
@@ -155,12 +143,22 @@ function recall($target = true, $sessionKey = '')
         if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['messageChain'][0]['id'];
         else return false;
     } else $target = (int) $target;
-    return autoAdapter('recall', array('sessionKey' => $sessionKey, 'target' => $target));
+    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
 function groupList($sessionKey = '')
 {
     return HttpAdapter('groupList', array('sessionKey' => $sessionKey));
+}
+
+function memberList($target = true, $sessionKey = '')
+{
+    if ($target === true) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
 /**

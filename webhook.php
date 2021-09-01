@@ -1,5 +1,5 @@
 <?php
-require_once "core.php";
+require_once "loader.php";
 header('content-type: application/json');
 
 $_DATA = json_decode(file_get_contents("php://input"), true);
