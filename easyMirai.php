@@ -178,7 +178,7 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
     $n = count($session);
     for ($i = 0; $i < $n; $i++) {
         if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq || empty($qq)) {
-            if(empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
+            if (empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
             if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
                 $res = HttpAdapter_verify();
                 if ($res['code'] == 0) {
@@ -384,4 +384,27 @@ function check_gifcartoon($image_file)
     $image_head = fread($fp, 1024);
     fclose($fp);
     return preg_match("/" . chr(0x21) . chr(0xff) . chr(0x0b) . 'NETSCAPE2.0' . "/", $image_head) ? false : true;
+}
+
+/**
+ * 为私聊会话或私聊启动 session
+ */
+function mirai_session_start()
+{
+    if (defined('webhook') && webhook) {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        }
+        global $_DATA;
+
+        if ($_DATA['type'] == 'GroupMessage') {
+            $sid = 'G' . $_DATA['sender']['id'] . '-' . $_DATA['sender']['group']['id'];
+        } else {
+            $sid = 'P' . $_DATA['sender']['id'];
+        }
+        session_id($sid);
+        return session_start();
+    } else {
+        return false;
+    }
 }

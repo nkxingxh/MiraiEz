@@ -165,25 +165,77 @@ function memberList($target = true, $sessionKey = '')
  * 处理 添加好友申请 事件
  * @see https://github.com/project-mirai/mirai-api-http/blob/master/docs/api/API.md#添加好友申请
  */
-function resp_newFriendRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+function resp_newFriendRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
 {
-    return autoAdapter('resp_newFriendRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
 }
 
 /**
  * 处理 用户入群申请 事件
  */
-function resp_memberJoinRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+function resp_memberJoinRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
 {
-    return autoAdapter('resp_memberJoinRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
 }
 
 /**
  * 处理 Bot被邀请入群申请 事件
  */
-function resp_botInvitedJoinGroupRequestEvent($eventId, $fromId, $groupId, $operate, $message = "", $sessionKey = '')
+function resp_botInvitedJoinGroupRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
 {
-    return autoAdapter('resp_botInvitedJoinGroupRequestEvent', array('eventId' => $eventId, 'fromId' => $fromId, 'groupId' => $groupId, 'operate' => $operate, 'message' => $message, 'sessionKey' => $sessionKey));
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+function groupConfig($target = true, $sessionKey = '')
+{
+    if ($target === true) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
 /**
