@@ -370,6 +370,7 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
         if (strlen($d) < strlen($OriginImage)) return $d;
         else return $OriginImage;
     } else {
+		unlink($imgdst);
         return false;
     }
 }
