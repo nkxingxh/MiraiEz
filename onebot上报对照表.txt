@@ -1,0 +1,34 @@
+post_type		X_type		sub_type		mirai_type
+message		private		friend		FriendMessage
+message		private		group		TempMessage	//群临时消息
+message		private		other		StrangerMessage	//陌生人消息
+message		group		normal		GroupMessage
+message		group		anonymous	--		//群匿名消息
+message		group		notice		--		//系统提示（如「管理员已禁止群内匿名聊天」
+
+notice		group_upload	--		GroupMessage	//需要消息链转换File
+notice		group_admin	set		BotGroupPermissionChangeEvent	//会舍去除Bot权限被改变以外的事件
+notice		group_admin	unset		BotGroupPermissionChangeEvent	//同上
+notice		group_decrease	leave		MemberLeaveEventQuit / BotLeaveEventActive	//主动离群
+notice		group_decrease	kick		MemberLeaveEventKick		//成员被踢出
+notice		group_decrease	kick_me		BotLeaveEventKick			//Bot被踢出
+notice		group_increase	approve		MemberJoinEvent	//管理员已同意入群
+notice		group_increase	invite		MemberJoinEvent	//(管理员)邀请入群 (mirai中没有作此区分，所以舍去入群方式)
+notice		group_ban	ban		MemberMuteEvent / BotMuteEvent  (在mirai中，成员与bot被禁言是两个事件)
+notice		group_ban	lift_ban		MemberUnmuteEvent / BotUnmuteEvent
+notice		friend_add	--		--		//mirai中只有 收到好友申请 事件，而没有好友添加事件
+notice		group_recall	--		GroupRecallEvent	//群消息撤回
+notice		friend_recall	--		FriendRecallEvent	//好友消息撤回
+notice		notify		poke		NudgeEvent	//戳一戳事件
+notice		notify		lucky_king		--		//群红包运气王
+notice		notify		honor		MemberSpecialTitleChangeEvent	//群头衔改动
+
+request		friend		--		NewFriendRequestEvent
+request		group		add		MemberJoinRequestEvent		//入群申请
+request		group		invite		BotInvitedJoinGroupRequestEvent	//Bot被邀请入群申请
+
+meta_event	lifecycle		enable		BotOnlineEvent		//Bot启用(可以理解为上线？)
+meta_event	lifecycle		disable		BotOfflineEventActive	//Bot停用(下线？)
+meta_event	lifecycle		connect		--			//ws连接成功
+meta_event	heartbeat		--		--			//心跳
+
