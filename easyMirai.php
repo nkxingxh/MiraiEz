@@ -1,12 +1,43 @@
 <?php
 
 /**
+ * 判断指定群是否存在指定成员
+ * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
+ * @param int $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
+ */
+function isInGroup($groupID = null, $target = null, $sessionKey = null)
+{
+    global $_DATA;
+    if($groupID === true) {
+        if (!empty($_DATA['sender']['group']['id'])) $groupID = $_DATA['sender']['group']['id'];
+        else return false;
+    } else $groupID = (int) $groupID;
+
+    if ($target === true) {
+        if (!empty($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
+        else return false;
+    } else $target = (int) $target;
+
+    $resp = memberList($groupID);
+    if($resp['code'] !== 0) {
+        
+    }
+}
+
+/**
  * 获取 BOT 在群中的权限
  * 返回 MEMBER / ADMINISTRATOR / OWNER / false
  * 返回 false 表示未加群
  */
-function getGroupPermission($groupID, $sessionKey = '')
+function getGroupPermission($groupID = null, $sessionKey = '')
 {
+    if($groupID === null) {
+        global $_DATA;
+        if($_DATA['type'] == 'GroupMessage')
+            $groupID = $_DATA['sender']['group']['id'];
+        else 
+            return null;
+    }
     $groupList = groupList($sessionKey);
     if ($groupList['code'] == 0) {
         foreach ($groupList['data'] as $value) {
