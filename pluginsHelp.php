@@ -33,10 +33,10 @@ function getConfig($configFile)
     return $config;
 }
 
-function saveConfig($configFile, $config)
+function saveConfig($configFile, $config, $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
 {
     $file = dataDir . "/$configFile.json";
-    return saveFile($file, json_encode($config));
+    return saveFile($file, json_encode($config, $jsonEncodeFlags));
 }
 
 /**

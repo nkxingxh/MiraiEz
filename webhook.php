@@ -1,19 +1,21 @@
 <?php
 require_once "loader.php";
 header('content-type: application/json');
-
 $_DATA = json_decode(file_get_contents("php://input"), true);
-saveFile('webhook.log', file_get_contents("php://input"));
 
 if (!verifyAuthorization()) {
-    header('HTTP/1.1 403 Forbidden');
-    exit;
+    if (!OneBot_auth()) {
+        header('HTTP/1.1 403 Forbidden');
+        exit;
+    }
+} else {
+    $_DATA = json_decode($debug ? $debug_data : file_get_contents("php://input"), true);
 }
 
 // Webhook 消息预处理
 $webhooked = false;
 define("webhook", true);
-define("bot", $_SERVER['HTTP_BOT']);
+defined('bot') or define("bot", $_SERVER['HTTP_BOT']);
 
 if (isMessage($_DATA['type'])) {
     $_PlainText = messageChain2PlainText($_DATA['messageChain']);
@@ -43,7 +45,7 @@ unset($__plugin__);
 if (is_array($_HOOK)) {
     foreach ($_HOOK as $_FUNC) {
         $return_code = $_FUNC($_DATA);
-        if($return_code === 1) {    //返回值为 1 拦截
+        if ($return_code === 1) {    //返回值为 1 拦截
             break;
         }
     }

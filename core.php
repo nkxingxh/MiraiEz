@@ -9,9 +9,12 @@ function autoAdapter($command = '', $content = array())
     global $webhooked;
     //可以使用 webhook 的命令
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
-    $USE_HTTP = $webhooked || (!in_array($command, $WEBHOOK_FUNC));
+    $USE_HTTP = $webhooked
+        || (!in_array($command, $WEBHOOK_FUNC))
+        || defined('webhook') == false
+        || defined("OneBot");
 
-    if ($USE_HTTP || defined('webhook') == false) {
+    if ($USE_HTTP) {
         $command = str_replace('_', '/', $command);     //命令格式转换
         return HttpAdapter($command, $content);
     } else {
@@ -24,6 +27,12 @@ function autoAdapter($command = '', $content = array())
 
 function HttpAdapter($command, $content = array())
 {
+    //OneBot Bridge
+    if (defined("OneBot")) {
+        writeLog("转交给 OneBot_API_bridge 处理", "HttpAdapter", "OneBot");
+        return OneBot_API_bridge($command, $content);
+    }
+
     //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
     //自动获取 sessionKey

@@ -7,9 +7,10 @@ require_once "$baseDir/string.php";
 require_once "$baseDir/curl.php";
 require_once "$baseDir/easyMirai.php";
 require_once "$baseDir/pluginsHelp.php";
+require_once "$baseDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '1.1.2');
+define("version", '1.4.0');
 
 require_once "core.php";

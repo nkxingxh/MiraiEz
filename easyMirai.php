@@ -1,12 +1,42 @@
 <?php
 
 /**
+ * 判断指定群是否存在指定成员
+ * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
+ * @param int $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
+ */
+function isInGroup($groupID = null, $target = null, $sessionKey = null)
+{
+    global $_DATA;
+    if ($groupID === true) {
+        if (!empty($_DATA['sender']['group']['id'])) $groupID = $_DATA['sender']['group']['id'];
+        else return false;
+    } else $groupID = (int) $groupID;
+
+    if ($target === true) {
+        if (!empty($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
+        else return false;
+    } else $target = (int) $target;
+
+    $resp = memberList($groupID);
+    if ($resp['code'] !== 0) {
+    }
+}
+
+/**
  * 获取 BOT 在群中的权限
  * 返回 MEMBER / ADMINISTRATOR / OWNER / false
  * 返回 false 表示未加群
  */
-function getGroupPermission($groupID, $sessionKey = '')
+function getGroupPermission($groupID = null, $sessionKey = '')
 {
+    if ($groupID === null) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage')
+            $groupID = $_DATA['sender']['group']['id'];
+        else
+            return null;
+    }
     $groupList = groupList($sessionKey);
     if ($groupList['code'] == 0) {
         foreach ($groupList['data'] as $value) {
@@ -143,22 +173,30 @@ function messageChain2FileId($messageChain = null)
  * 
  * @param array|string $messageChain    消息链
  * @param int $quote                    要引用的消息 ID (0 为不引用, true 为自动引用, 其他 int 整数为 消息ID)
+ * @param int $at                       要 @ 的人 (0 为不 @, true 为自动 @, 其他 int 整数为 qq 号或频道 tiny_id)
  */
-function replyMessage($messageChain, $quote = 0, $sessionKey = '')
+function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 {
     global $_DATA, $_ImageUrl;
     //在临时消息中,回复带有图片的消息会出 bug
-    if ($quote === true && (!($_DATA['type'] == 'TempMessage' && count($_ImageUrl) > 0))) $quote = $_DATA['messageChain'][0]['id'];
+    if ($quote === true && (!($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0)))
+        $quote = $_DATA['messageChain'][0]['id'];
+    if ($at === true && in_array($_DATA['type'], ['GroupMessage', 'GuildChannelMessage']))
+        $at = $_DATA['sender']['id'];
     else $quote = 0;
     if (webhook) {
         if ($_DATA['type'] == 'FriendMessage') {
-            sendFriendMessage($_DATA['sender']['id'], $messageChain, $quote, $sessionKey);
+            return sendFriendMessage($_DATA['sender']['id'], $messageChain, $quote, $sessionKey);
         } elseif ($_DATA['type'] == 'GroupMessage') {
-            sendGroupMessage($_DATA['sender']['group']['id'], $messageChain, $quote, $sessionKey);
+            if (!empty($at)) $messageChain = array_merge([getMessageChain_At($at)], $messageChain);
+            return sendGroupMessage($_DATA['sender']['group']['id'], $messageChain, $quote, $sessionKey);
         } elseif ($_DATA['type'] == 'TempMessage') {
-            sendTempMessage($_DATA['sender']['id'], $_DATA['sender']['group']['id'], $messageChain, $quote, $sessionKey);
+            return sendTempMessage($_DATA['sender']['id'], $_DATA['sender']['group']['id'], $messageChain, $quote, $sessionKey);
+        } elseif ($_DATA['type'] == 'GuildChannelMessage') {
+            if (!empty($at)) $messageChain = array_merge([getMessageChain_At($at)], $messageChain);
+            return sendGuildChannelMessage($_DATA['sender']['guild']['id'], $_DATA['sender']['guild']['channel']['id'], $messageChain, $quote);
         }
-    }
+    } else return false;
 }
 
 /**
@@ -282,9 +320,14 @@ function getMessageChain_Image($ImageUrl)
     return array('type' => 'Image', 'url' => $ImageUrl);
 }
 
+function getMessageChain_Json($json)
+{
+    return array('type' => 'Json', 'json' => $json);
+}
+
 function isMessage($type)
 {
-    return $type == 'GroupMessage' || $type == 'FriendMessage' || $type == 'TempMessage';
+    return $type == 'GroupMessage' || $type == 'FriendMessage' || $type == 'TempMessage' || 'GuildChannelMessage';
 }
 
 /**
@@ -370,7 +413,7 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
         if (strlen($d) < strlen($OriginImage)) return $d;
         else return $OriginImage;
     } else {
-		unlink($imgdst);
+        unlink($imgdst);
         return false;
     }
 }
