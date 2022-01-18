@@ -1,4 +1,7 @@
 <?php
+define("pfa", true);       //启用性能分析
+if (pfa) $_startTime = microtime(true);
+
 require_once "loader.php";
 header('content-type: application/json');
 $_DATA = json_decode(file_get_contents("php://input"), true);
@@ -34,6 +37,7 @@ $_loadPlugins = array(
 $pluginsDir = "$baseDir/plugins";
 define("pluginsDir", $pluginsDir);
 
+if (pfa) $_elapsedTime_hook = microtime(true);
 $plugins = array();
 hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');
 
@@ -42,6 +46,8 @@ foreach ($_loadPlugins as $__plugin__) {
 }
 unset($__plugin__);
 
+$_RegisteredFuncNum = count($_HOOK);
+$_hookedFuncCount = 0;
 if (is_array($_HOOK)) {
     foreach ($_HOOK as $_FUNC) {
         $return_code = $_FUNC($_DATA);
@@ -50,6 +56,14 @@ if (is_array($_HOOK)) {
         }
     }
     unset($_FUNC);
+}
+
+if (pfa) {
+    $_elapsedTime_hook = round(microtime(true) - $_elapsedTime_hook, 4);
+    $_elapsedTime = round(microtime(true) - $_startTime, 5);
+    $pfas = "R: {$_RegisteredFuncNum} func(s), H: {$_hookedFuncCount} func(s), E: $_elapsedTime_hook/$_elapsedTime s. [" . $_DATA['type'] . "]";
+    if (defined('OneBot')) $pfas .= ' (OneBotBridge activated)';
+    writeLog($pfas, '', 'pfa');
 }
 
 /**
