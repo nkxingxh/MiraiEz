@@ -1,7 +1,7 @@
 <?php
 define("WEBHOOK_ERROR_REPORT_LEAVE", 0);    //webhook 模式下的错误报告级别
 define("IGNORE_UNREPORTED_ERRORS", true);   //是否忽略未报告的错误
-define("MEMORY_RESERVE_SIZE", 1048576);     //内存预留大小
+define("MEMORY_RESERVE_SIZE", 262144);      //内存预留大小
 
 if (webhook) {
     //隐藏所有错误

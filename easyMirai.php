@@ -399,8 +399,9 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
             imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             break;
     }
-    imagedestroy($image);   //释放内存
     unlink($imgsrc);        //删除源文件
+    if(empty($image)) return false;
+    imagedestroy($image);   //释放内存
 
     $result = ($optType == 'png') ? imagepng($image_wp, $imgdst, $quality) : imagejpeg($image_wp, $imgdst, $quality);
     imagedestroy($image_wp);    //释放内存
