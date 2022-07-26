@@ -1,5 +1,5 @@
 <?php
-define("OneBotBridge", true);       //是否启用 OneBotBridge
+define("OneBotBridge", true);
 require_once "$baseDir/miraiOneBot.php";
 
 /**
