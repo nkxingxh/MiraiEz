@@ -6,6 +6,7 @@
  */
 function autoAdapter($command = '', $content = array())
 {
+    writeLog("$command => " . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'Adapter');
     global $webhooked;
     //可以使用 webhook 的命令
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
@@ -155,9 +156,14 @@ function recall($target = true, $sessionKey = '')
     return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
+function friendList($sessionKey = '')
+{
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
+}
+
 function groupList($sessionKey = '')
 {
-    return HttpAdapter('groupList', array('sessionKey' => $sessionKey));
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
 }
 
 function memberList($target = true, $sessionKey = '')

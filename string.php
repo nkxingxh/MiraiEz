@@ -157,11 +157,33 @@ function utf8_strlen($str)
 function filterEmoji($str)
 {
     $str = preg_replace_callback(
-	        '/./u',
-            function (array $match) {
-                return strlen($match[0]) >= 4 ? '' : $match[0];
-            },
-            $str);
+        '/./u',
+        function (array $match) {
+            return strlen($match[0]) >= 4 ? '' : $match[0];
+        },
+        $str
+    );
 
-     return $str;
+    return $str;
+}
+
+// 随机 UUID
+function rand_uuid()
+{
+    $chars = md5(uniqid(mt_rand(), true));
+    $uuid = substr($chars, 0, 8) . '-'
+        . substr($chars, 8, 4) . '-'
+        . substr($chars, 12, 4) . '-'
+        . substr($chars, 16, 4) . '-'
+        . substr($chars, 20, 12);
+    return $uuid;
+}
+
+/**
+ * str_starts_with_non_native
+ * 判断字符串是否以特定字符串开始
+ */
+function str_starts_with_non_native($haystack, $needle)
+{
+    return strcmp($needle, substr($haystack, 0, strlen($needle))) === 0;
 }

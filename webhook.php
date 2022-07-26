@@ -1,27 +1,30 @@
 <?php
+define("webhook", true);
 require_once "loader.php";
 header('content-type: application/json');
+
 $_DATA = json_decode(file_get_contents("php://input"), true);
 
-if (!verifyAuthorization()) {
+if (verifyAuthorization()) {
+    $_DATA = json_decode(file_get_contents("php://input"), true);
+} else {
     if (!OneBot_auth()) {
         header('HTTP/1.1 403 Forbidden');
         exit;
     }
-} else {
-    $_DATA = json_decode($debug ? $debug_data : file_get_contents("php://input"), true);
 }
 
 // Webhook 消息预处理
 $webhooked = false;
-define("webhook", true);
-defined('bot') or define("bot", $_SERVER['HTTP_BOT']);
+define("bot", $_SERVER['HTTP_BOT']);
 
 if (isMessage($_DATA['type'])) {
     $_PlainText = messageChain2PlainText($_DATA['messageChain']);
     $_ImageUrl = messageChain2ImageUrl($_DATA['messageChain']);
     $_At = messageChain2At($_DATA['messageChain']);
 }
+
+if (pfa) $pfa_webhookInitTime = microtime(true);
 
 //这里是你要加载的插件列表
 //这里是你要加载的插件列表
@@ -42,15 +45,21 @@ foreach ($_loadPlugins as $__plugin__) {
 }
 unset($__plugin__);
 
+if (pfa) $pfa_webhookProcessTime = microtime(true);
+
+$_hookedFuncCount = 0;
 if (is_array($_HOOK)) {
+    writeLog("type: " . $_DATA['type'], 'webhook', 'webhook');
     foreach ($_HOOK as $_FUNC) {
         $return_code = $_FUNC($_DATA);
-        if ($return_code === 1) {    //返回值为 1 拦截
+        if (isset($return_code) && $return_code === 1) {    //返回值为 1 拦截
             break;
         }
     }
     unset($_FUNC);
 }
+
+if (pfa) pfa_end();
 
 /**
  * HOOK 注册

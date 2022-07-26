@@ -161,9 +161,8 @@ function messageChain2FileId($messageChain = null)
                 break;
             }
         }
-        if ($id === true) return false;
+        if (isset($id) && $id === true) return false;
     } else return false;
-    return $id;
 }
 
 /**
@@ -179,11 +178,10 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 {
     global $_DATA, $_ImageUrl;
     //在临时消息中,回复带有图片的消息会出 bug
-    if ($quote === true && (!($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0)))
+    if ($quote === true && ($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0) == false) {
         $quote = $_DATA['messageChain'][0]['id'];
-    if ($at === true && in_array($_DATA['type'], ['GroupMessage', 'GuildChannelMessage']))
-        $at = $_DATA['sender']['id'];
-    else $quote = 0;
+    }
+    $at = in_array($_DATA['type'], ['GroupMessage', 'GuildChannelMessage']) ? ($at === true ? $_DATA['sender']['id'] : $at) : 0;
     if (webhook) {
         if ($_DATA['type'] == 'FriendMessage') {
             return sendFriendMessage($_DATA['sender']['id'], $messageChain, $quote, $sessionKey);
@@ -195,7 +193,7 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
         } elseif ($_DATA['type'] == 'GuildChannelMessage') {
             if (!empty($at)) $messageChain = array_merge([getMessageChain_At($at)], $messageChain);
             return sendGuildChannelMessage($_DATA['sender']['guild']['id'], $_DATA['sender']['guild']['channel']['id'], $messageChain, $quote);
-        }
+        } else return false;
     } else return false;
 }
 
@@ -325,9 +323,13 @@ function getMessageChain_Json($json)
     return array('type' => 'Json', 'json' => $json);
 }
 
-function isMessage($type)
+function isMessage($type = null)
 {
-    return $type == 'GroupMessage' || $type == 'FriendMessage' || $type == 'TempMessage' || 'GuildChannelMessage';
+    if ($type === null && webhook) {
+        global $_DATA;
+        $type = $_DATA['type'];
+    }
+    return $type == 'GroupMessage' || $type == 'FriendMessage' || $type == 'TempMessage' || $type == 'GuildChannelMessage';
 }
 
 /**
@@ -339,7 +341,7 @@ function getImageType($image)
     do {    //取一个没有被占用的文件名
         $filename = baseDir . '/tmp/img_' . str_rand(8) . '.img';
     } while (file_exists($filename));
-    if (!file_put_contents($filename, $image)) return false;
+    if (file_put_contents($filename, $image) === false) return false;
     $imginfo = getimagesize($filename);
     unlink($filename);
     if ($imginfo === false) return false;
@@ -386,7 +388,7 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
             if ($giftype) {
                 $image = imagecreatefromgif($imgsrc);
                 imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-            } else return false;
+            } //else return false;  //在此处处理会导致无法清理图片
             break;
         case 2:
             $image = imagecreatefromjpeg($imgsrc);
@@ -397,14 +399,12 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
             imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
             break;
     }
+    imagedestroy($image);   //释放内存
+    unlink($imgsrc);        //删除源文件
 
     $result = ($optType == 'png') ? imagepng($image_wp, $imgdst, $quality) : imagejpeg($image_wp, $imgdst, $quality);
-
-    //释放资源
-    imagedestroy($image_wp);
-    imagedestroy($image);
-    unlink($imgsrc);
-
+    imagedestroy($image_wp);    //释放内存
+    
     if ($result) {
         $d = file_get_contents($imgdst);
         unlink($imgdst);

@@ -10,6 +10,7 @@ require_once "$baseDir/miraiOneBot.php";
  */
 function OneBot_auth()
 {
+    if(!OneBotBridge) return false;
     //writeLog("验证开始", "Auth", "OneBot");
     $config = OneBot_get_config();
     $auth = false;
