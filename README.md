@@ -21,7 +21,7 @@ easyMirai.php 中的函数则可以帮助你更快的编写插件。
 ## OneBot 兼容
 
 miraiez 现在可以兼容部分 OneBot 框架，
-相比其他 OneBot 框架来说，对于 go-cqhttp 的兼容性是最好的。
+相比其他 OneBot 框架来说， go-cqhttp 的兼容性是最好的。
 建议与频道相关的功能使用 go-cqhttp，
 其他功能使用 mirai-api-http 来获得最好的使用体验。
 
