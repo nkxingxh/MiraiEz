@@ -15,6 +15,8 @@ require_once "$baseDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '1.5.0');
+define("version", '2.0.0');
 
 require_once "core.php";
+
+if (pfa) $pfa_loadedTime = microtime(true);

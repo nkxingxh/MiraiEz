@@ -58,11 +58,11 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 //接管致命错误
 register_shutdown_function(function () {
     //释放预留的内存
-    unset($_memoryReserve);
+    unset($GLOBALS['_memoryReserve']);
 
     $error = error_get_last();
     if(!isFatalError($error)) {
-        $_memoryReserve = str_repeat('x', MEMORY_RESERVE_SIZE); //预留内存
+        $GLOBALS['_memoryReserve'] = str_repeat('x', MEMORY_RESERVE_SIZE); //预留内存
         return;
     }
 
