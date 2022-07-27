@@ -2,7 +2,9 @@
 //定义插件父类
 class pluginParent
 {
-    const _pluginName = "miraiez";
+    const _pluginName = "MiraiEz";
+    const _pluginAuthor = "NKXingXh";
+    const _pluginDescription = "MiraiEz 插件核心";
     const _pluginPackage = "top.nkxingxh.miraiez";
     const _pluginVersion = version;
 
@@ -111,6 +113,8 @@ function pluginRegister($pluginClass)
     //创建插件对象
     $_plugins[$__pluginClassName__] = array(
         'name' => $pluginClass::_pluginName,
+        'author' => $pluginClass::_pluginAuthor,
+        'description' => $pluginClass::_pluginDescription,
         'package' => $pluginClass::_pluginPackage,
         'version' => $pluginClass::_pluginVersion,
         'file' => $GLOBALS['__pluginFile__'],

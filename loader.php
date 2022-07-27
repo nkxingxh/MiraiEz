@@ -1,4 +1,7 @@
 <?php
+if (defined('mdm')) { //如果在MDM中运行则定义全局变量
+    global $baseDir, $dataDir;
+}
 $baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
 define('baseDir', $baseDir);            //定义站点目录
 

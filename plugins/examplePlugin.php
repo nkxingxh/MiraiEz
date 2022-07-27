@@ -2,6 +2,8 @@
 class examplePlugin extends pluginParent
 {
     const _pluginName = "examplePlugin";
+    const _pluginAuthor = "nkxingxh";
+    const _pluginDescription = "示例插件";
     const _pluginPackage = "top.nkxingxh.examplePlugin";
     const _pluginVersion = "1.0.0";
 
