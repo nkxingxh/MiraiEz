@@ -16,16 +16,16 @@ class pluginParent
     //初始化插件
     public function _init()
     {
-        hookRegister('_hook', 'FriendMessage');
+        hookRegister('miraiezHook', 'FriendMessage');
         return true;
     }
+}
 
-    public function _hook($_DATA)
-    {
-        global $_PlainText;
-        if ($_PlainText == '/miraiez') {
-            replyMessage("欢迎使用 MiraiEz! 当前版本: " . self::_pluginVersion);
-        }
+function miraiezHook($_DATA)
+{
+    global $_PlainText;
+    if ($_PlainText == '/miraiez') {
+        replyMessage("欢迎使用 MiraiEz! 当前版本: " . pluginParent::_pluginVersion);
     }
 }
 
@@ -50,7 +50,7 @@ function loadPlugins($dir = 'plugins')
 
     $GLOBALS['__pluginFile__'] = "plugins.php";
     pluginRegister(new pluginParent);           //注册一个空插件，用于挂钩全局函数
-    unset($_plugins['pluginParent']['object']); //删除空插件中的 Object
+    unset($_plugins['pluginParent']['object']); //删除空插件对象
 
     //遍历所有插件文件
     foreach ($_plugins_files as $__pluginFile__) {

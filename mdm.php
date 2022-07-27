@@ -41,13 +41,15 @@ class miraiEzPluginsDogeManager
                 . "\n--enable - 启用插件"
                 . "\n--disable - 禁用插件"
                 . "\n--update - 更新插件"
-                . "\n--list - 列出所有插件";
+                . "\n--list - 列出所有插件"
+                . "\n";
             return;
         } elseif (isset($options['version'])) {
             echo "MiraiEz Plugins Doge Manager"
                 . "\n版本: " . self::_version
                 . "\n作者: NKXingXh"
-                . "\n描述: 插件管理器";
+                . "\n描述: 插件管理器"
+                . "\n";
             return;
         } elseif (isset($options['list'])) {
             require_once "loader.php";
@@ -65,7 +67,7 @@ class miraiEzPluginsDogeManager
             }
             return;
         } else {
-            echo "参数错误, 使用 --help 查看帮助";
+            echo "参数错误, 使用 --help 查看帮助\n";
             return;
         }
     }
