@@ -14,7 +14,16 @@ class pluginParent
     //初始化插件
     public function _init()
     {
+        hookRegister('_hook', 'FriendMessage');
         return true;
+    }
+
+    public function _hook($_DATA)
+    {
+        global $_PlainText;
+        if ($_PlainText == '/miraiez') {
+            replyMessage("欢迎使用 MiraiEz! 当前版本: " . self::_pluginVersion);
+        }
     }
 }
 
@@ -37,7 +46,6 @@ function loadPlugins($dir = 'plugins')
     $_plugins_count_register = 0;                //注册插件计数器
     $_plugins_count_load = 0;                    //加载插件计数器
 
-    //global $__pluginFile__, $__pluginClassName__;
     $GLOBALS['__pluginFile__'] = "plugins.php";
     pluginRegister(new pluginParent);           //注册一个空插件，用于挂钩全局函数
     unset($_plugins['pluginParent']['object']); //删除空插件中的 Object
@@ -47,9 +55,9 @@ function loadPlugins($dir = 'plugins')
         //判断是否为 .php 文件
         if (!preg_match('/\.php$/', $__pluginFile__)) continue;
         if (is_file("$pluginsDir/$__pluginFile__")) {
-            $GLOBALS['__pluginFile__'] = $__pluginFile__;
-            $GLOBALS['__pluginClassName__'] = "pluginParent";
-            include "$pluginsDir/$__pluginFile__";
+            $GLOBALS['__pluginFile__'] = $__pluginFile__;       //设置当前插件文件名
+            $GLOBALS['__pluginClassName__'] = "pluginParent";   //默认插件类名
+            include "$pluginsDir/$__pluginFile__";              //加载插件文件
         }
     }
     unset($GLOBALS['__pluginFile__'], $GLOBALS['__pluginClassName__'], $_plugins_files);
@@ -60,29 +68,23 @@ function loadPlugins($dir = 'plugins')
  */
 function execPluginsFunction()
 {
-    global $_plugins, $_DATA;
-    //已执行函数数量
-    global $_plugins_count_exec;
-    $_plugins_count_exec = 0;
-    //开始执行已挂钩的函数
-    foreach ($_plugins as $__plugin__) {
-        //判断是否有挂钩函数
-        if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) {
-            //遍历挂钩函数
-            foreach ($__plugin__['hooked'] as $__hooked_func__) {
-                $_plugins_count_exec++;
-                //执行挂钩函数
-                if (isset($__plugin__['object']) && is_object($__plugin__['object'])) {
+    global $_plugins, $_DATA;                          //插件列表，数据
+    global $_plugins_count_exec;                       //执行插件计数器
+    $_plugins_count_exec = 0;                           //初始化计数器
+    foreach ($_plugins as $__plugin__) {            //遍历已注册的插件列表
+        if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) { //判断是否已挂钩
+            foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
+                $_plugins_count_exec++;                               //计数器加1
+                if (isset($__plugin__['object']) && is_object($__plugin__['object']))  //判断插件对象是否存在
                     $return_code = $__plugin__['object']->$__hooked_func__($_DATA);
-                } else
+                else
                     $return_code = $__hooked_func__($_DATA);
 
                 //拦截
                 if (isset($return_code) && $return_code === 1)
                     break;
             }
-            //释放 Object
-            unset($__plugin__['object']);
+            unset($__plugin__['object']);                       //释放插件对象
         }
     }
     //返回计数器
@@ -148,9 +150,11 @@ function hookRegister($func, ...$types)
     }
     foreach ($types as $type) {
         if ($type == $_DATA['type']) {      //仅当注册类型与 webhook 上报的类型一样时，才添加
-            $_plugins[$GLOBALS['__pluginClassName__']]['hooked'][] = $func;  //挂钩类函数
+            if (empty($GLOBALS['__pluginClassName__'])) $_plugins['pluginParent']['hooked'][] = $func;  //添加到空插件中
+            else $_plugins[$GLOBALS['__pluginClassName__']]['hooked'][] = $func;  //挂钩类函数
+
             if (pfa) $pfa_hookedFunc++;  //挂钩函数数量加 1
-            return true;                               //挂钩成功
+            return true;                //挂钩成功
             break;
         }
     }
