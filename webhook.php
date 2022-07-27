@@ -30,6 +30,7 @@ loadPlugins();  //加载插件
 
 if (pfa) $pfa_pluginFuncTime = microtime(true);
 execPluginsFunction();  //执行插件函数
+hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
 if (pfa) pfa_end();
 
