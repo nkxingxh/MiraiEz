@@ -4,7 +4,6 @@ define("IGNORE_UNREPORTED_ERRORS", true);   //是否忽略未报告的错误
 define("MEMORY_RESERVE_SIZE", 262144);      //内存预留大小
 
 if (webhook) {
-    //隐藏所有错误
     error_reporting(WEBHOOK_ERROR_REPORT_LEAVE);
 }
 
@@ -31,6 +30,8 @@ set_exception_handler(function ($e) {
         ) {
             replyMessage($msg);
         }
+    } elseif (defined('mdm_cli')) {
+        echo $msg . "\n";
     }
 });
 
@@ -51,6 +52,8 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $debug_groups))
         ) {
             replyMessage($msg);
+        } elseif (defined('mdm_cli')) {
+            echo $msg . "\n";
         }
     }
 });
@@ -61,7 +64,7 @@ register_shutdown_function(function () {
     unset($GLOBALS['_memoryReserve']);
 
     $error = error_get_last();
-    if(!isFatalError($error)) {
+    if (!isFatalError($error)) {
         $GLOBALS['_memoryReserve'] = str_repeat('x', MEMORY_RESERVE_SIZE); //预留内存
         return;
     }
@@ -82,6 +85,8 @@ register_shutdown_function(function () {
             ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $debug_groups))
         ) {
             replyMessage($msg);
+        } elseif (defined('mdm_cli')) {
+            echo $msg . "\n";
         }
     }
 

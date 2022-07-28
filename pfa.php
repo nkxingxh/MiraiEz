@@ -1,6 +1,6 @@
 <?php
 //是否启用性能分析
-define("pfa", true);
+define("pfa", false);
 
 if (pfa) {
     //开始统计性能
