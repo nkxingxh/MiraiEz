@@ -10,7 +10,7 @@
 例如 http://localhost/webhook.php
 完成上述步骤后，请修改 config.php 中的相关设置。
 
-## 插件
+## 插件开发
 
 将你编写的插件放入 plugins 文件夹即可自动加载
 请查看 plugins 文件夹中的示例插件；
@@ -19,6 +19,43 @@ easyMirai.php 中的函数则可以帮助你更快的编写插件。
 
 > 现已支持将插件包装在 类 (Class) 中，同时兼容老版本插件。
 我们推荐使用本框架的开发者将老版本插件封装起来，具体可参考示例插件。
+
+## MDM 插件管理器
+
+> MiraiEz Plugins Doge Manager
+
+目前支持 插件列表、启用、禁用、安装、卸载与更新 功能。
+
+查看 [插件仓库](https://github.com/nkxingxh/miraiez-plugins "插件仓库")
+
+#### ~~演示~~
+
+    Shell > php mdm.php --help
+    MiraiEz Plugins Doge Manager
+    
+    --help  -  帮助
+    --version  -  版本信息
+    --install <插件包名>  -  安装插件
+    --remove <插件包名>  -  卸载插件
+    --enable <插件包名>  -  启用插件
+    --disable <插件包名>  -  禁用插件
+    --update  -  更新插件
+    --list  -  列出所有插件
+    
+    Shell > php mdm.php --version
+    MiraiEz Plugins Doge Manager
+    
+    版本: 1.0.0
+    作者: NKXingXh
+    描述: 插件管理器
+    
+    Shell > php mdm.php --list
+    MiraiEz Plugins Doge Manager
+    已注册 1 个插件, 已加载 1 个插件
+    
+    已启用的插件:
+    examplePlugin   v1.0.0   (top.nkxingxh.examplePlugin)  -  示例插件  作者  nkxingxh
+    
 
 ## OneBot 兼容
 
@@ -38,6 +75,6 @@ miraiez 在收到消息上报后, 会自动在数据目录 (即 data_ 开头的�
 
 | 功能或特性 | 开发状态 | 说明 |
 | ----------- | --------- | ----- |
-| 插件对象化 | 测试中 | 将每个插件的内容包含在一个 类 (Class) 中。 |
-| 插件管理 | 开发中 | 允许通过插件管理器函数启用/禁用插件。 |
+| 插件对象 | 测试中 | 将每个插件的内容包含在一个 类 (Class) 中。 |
+| 插件管理 | 测试中 | 允许通过插件管理器对插件进行常见操作。 |
 | 命令解析 | 待开发 | 能够解析消息中的命令，例如 /ping github.com，并使插件可以注册特定命令而无需处理不相关消息。 |

@@ -2,7 +2,9 @@
 
 /**
  * MiraiEz Plugins Doge Manager
- * 插件管理器
+ * 插件管理器 (插件版本)
+ * 
+ * 开发中...
  */
 
 class miraiEzPluginsDogeManagerPlugin extends pluginParent
