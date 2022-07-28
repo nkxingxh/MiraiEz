@@ -24,62 +24,15 @@ if (isMessage($_DATA['type'])) {
     $_At = messageChain2At($_DATA['messageChain']);
 }
 
-if (pfa) $pfa_webhookInitTime = microtime(true);
+if (pfa) $pfa_pluginInitTime = microtime(true);
+require_once "plugins.php";
+loadPlugins();  //加载插件
 
-//这里是你要加载的插件列表
-//这里是你要加载的插件列表
-//这里是你要加载的插件列表
-//插件放在 plugins 文件夹
-$_loadPlugins = array(
-    'examplePlugin.php'
-);
-
-$pluginsDir = "$baseDir/plugins";
-define("pluginsDir", $pluginsDir);
-
-$plugins = array();
-hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');
-
-foreach ($_loadPlugins as $__plugin__) {
-    include "./plugins/$__plugin__";
-}
-unset($__plugin__);
-
-if (pfa) $pfa_webhookProcessTime = microtime(true);
-
-$_hookedFuncCount = 0;
-if (is_array($_HOOK)) {
-    writeLog("type: " . $_DATA['type'], 'webhook', 'webhook');
-    foreach ($_HOOK as $_FUNC) {
-        $return_code = $_FUNC($_DATA);
-        if (isset($return_code) && $return_code === 1) {    //返回值为 1 拦截
-            break;
-        }
-    }
-    unset($_FUNC);
-}
+if (pfa) $pfa_pluginFuncTime = microtime(true);
+execPluginsFunction();  //执行插件函数
+hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
 if (pfa) pfa_end();
-
-/**
- * HOOK 注册
- * @param string $func      目标函数名
- * @param string ...$types  注册的消息或事件类型, 具体可查阅 mirai-api-http 开发文档
- */
-function hookRegister($func, ...$types)
-{
-    global $_HOOK, $_DATA;
-    foreach ($types as $type) {
-        if ($type == $_DATA['type']) {      //仅当注册类型与 webhook 上报的类型一样时，才添加
-            if (empty($_HOOK)) {
-                $_HOOK = array($func);
-            } else {
-                $_HOOK[] = $func;
-            }
-            break;
-        }
-    }
-}
 
 function checkUpdates($_DATA)
 {

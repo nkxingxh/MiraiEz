@@ -48,52 +48,52 @@ function HttpAdapter($command, $content = array())
         //判断命令应该使用 GET 还是 POST 方式
         if (in_array($command, $FUNC_GET)) {
             $query = http_build_query($content);
-            $res = CurlGET(httpApi . "/$command?$query");
+            $resp = CurlGET(httpApi . "/$command?$query");
         } else {
             $data = json_encode($content);
-            $res = CurlPOST($data, httpApi . "/$command");
+            $resp = CurlPOST($data, httpApi . "/$command");
         }
-        $res = json_decode($res, true);
+        $resp = json_decode($resp, true);
 
-        if ($res['code'] == 3) {
+        if (isset($resp['code']) && $resp['code'] == 3) {
             $content['sessionKey'] = getSessionKey(defined('bot') ? bot : 0, true);
         }
         $error++;
-    } while (($res === null || $res['code'] == 3) && $error < 2);      //错误重试
-    return $res;
+    } while (($resp === null || (isset($resp['code']) && $resp['code'] == 3)) && $error < 2);      //错误重试
+    return $resp;
 }
 
 function HttpAdapter_verify()
 {
     $data = json_encode(array('verifyKey' => verifyKey));
-    $res = CurlPOST($data, httpApi . '/verify');
-    $res = json_decode($res, true);
-    if (empty($res)) {
-    } elseif ($res['code'] != 0) {
+    $resp = CurlPOST($data, httpApi . '/verify');
+    $resp = json_decode($resp, true);
+    if (empty($resp)) {
+    } elseif ($resp['code'] != 0) {
     }
-    return $res;
+    return $resp;
 }
 
 function HttpAdapter_bind($sessionKey, $qq)
 {
     $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq));
-    $res = CurlPOST($data, httpApi . '/bind');
-    $res = json_decode($res, true);
-    if (empty($res)) {
-    } elseif ($res['code'] != 0) {
+    $resp = CurlPOST($data, httpApi . '/bind');
+    $resp = json_decode($resp, true);
+    if (empty($resp)) {
+    } elseif ($resp['code'] != 0) {
     }
-    return $res;
+    return $resp;
 }
 
 function HttpAdapter_release($sessionKey, $qq)
 {
     $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq));
-    $res = CurlPOST($data, httpApi . '/release');
-    $res = json_decode($res, true);
-    if (empty($res)) {
-    } elseif ($res['code'] != 0) {
+    $resp = CurlPOST($data, httpApi . '/release');
+    $resp = json_decode($resp, true);
+    if (empty($resp)) {
+    } elseif ($resp['code'] != 0) {
     }
-    return $res;
+    return $resp;
 }
 
 /**

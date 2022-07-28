@@ -1,4 +1,7 @@
 <?php
+if (defined('mdm')) { //如果在MDM中运行则定义全局变量
+    global $baseDir, $dataDir;
+}
 $baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
 define('baseDir', $baseDir);            //定义站点目录
 
@@ -15,6 +18,8 @@ require_once "$baseDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '1.5.0');
+define("version", '2.0.0');
 
 require_once "core.php";
+
+if (pfa) $pfa_loadedTime = microtime(true);

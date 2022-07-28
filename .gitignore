@@ -1,0 +1,6 @@
+.vscode/
+data_*/
+tmp/
+logs/
+*.json
+*.drawio
