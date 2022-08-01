@@ -7,7 +7,7 @@
 
 class miraiEzPluginsDogeManager
 {
-    const _version = "1.0.0";
+    const _version = "1.1.0";
     const _pluginsCenterAPI = "https://api.nkxingxh.top/miraiez/plugins.php";
 
     //构造函数
@@ -25,26 +25,28 @@ class miraiEzPluginsDogeManager
         echo CliStyles::ColorCyan . "MiraiEz Plugins Doge Manager\n" . CliStyles::Reset;
         $shortopts  = "";
         $longopts  = array(
-            "help",
-            "version",
-            "install:",
-            "remove:",
-            "enable:",
-            "disable:",
-            "update",
-            "list"
+            "help",     //显示帮助
+            "version",  //显示版本
+            "install:", //安装插件
+            "remove:",  //卸载插件
+            "enable:",  //启用插件
+            "disable:", //禁用插件
+            "update",   //更新插件
+            "search:",  //搜索插件
+            "list"      //显示插件列表
         );
         $options = getopt($shortopts, $longopts);
         if (isset($options['help'])) {
-            echo  "\n--help - 帮助"
-                . "\n--version - 版本信息"
-                . "\n--install <插件包名> - 安装插件"
-                . "\n--remove <插件包名> - 卸载插件"
-                . "\n--enable <插件包名> - 启用插件"
-                . "\n--disable <插件包名> - 禁用插件"
-                . "\n--update - 更新插件"
-                . "\n--list - 列出所有插件"
-                . "\n";
+            echo  CliStyles::ColorYellow . "\n--help" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "帮助"
+                . CliStyles::ColorYellow . "\n--version" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "版本信息"
+                . CliStyles::ColorYellow . "\n--install " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "安装插件"
+                . CliStyles::ColorYellow . "\n--remove " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "卸载插件"
+                . CliStyles::ColorYellow . "\n--enable " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "启用插件"
+                . CliStyles::ColorYellow . "\n--disable " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "禁用插件"
+                . CliStyles::ColorYellow . "\n--search " . CliStyles::ColorCyan . "<关键字>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "搜索插件"
+                . CliStyles::ColorYellow . "\n--update" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "更新插件"
+                . CliStyles::ColorYellow . "\n--list" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "列出所有插件"
+                . CliStyles::ColorYellow .  "\n" . CliStyles::Reset;
             return;
         } elseif (isset($options['version'])) {
             echo  "\n版本: " . self::_version
@@ -82,7 +84,7 @@ class miraiEzPluginsDogeManager
                         . CliStyles::ColorCyan . "  " . CliStyles::StyleInvert . " v" . $plugin['version'] . ' ' . CliStyles::Reset
                         . CliStyles::ColorMagenta . " (" . $plugin['package'] . ")"
                         . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $plugin['description'] . "  "
-                        . CliStyles::Reset . "作者: " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $plugin['author'] . ' ' . CliStyles::Reset . "\n";
+                        . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $plugin['author'] . ' ' . CliStyles::Reset . "\n";
                 }
             }
             if (!empty($plugins_failed)) {
@@ -92,7 +94,7 @@ class miraiEzPluginsDogeManager
                         . CliStyles::ColorCyan . "  " . CliStyles::StyleInvert . " v" . $plugin['version'] . ' ' . CliStyles::Reset
                         . CliStyles::ColorMagenta . " (" . $plugin['package'] . ")"
                         . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $plugin['description'] . "  "
-                        . CliStyles::Reset . "作者: " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $plugin['author'] . ' ' . CliStyles::Reset . "\n";
+                        . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $plugin['author'] . ' ' . CliStyles::Reset . "\n";
                 }
             }
             echo CliStyles::Reset;
@@ -181,6 +183,7 @@ class miraiEzPluginsDogeManager
             $actionText = $action == 'install' ? '安装' : ($action == 'update' ? '升级' : '降级');
             //读取用户输入
             $input = trim(fgets(STDIN));
+            echo CliStyles::toPrevLine . CliStyles::clearLine . CliStyles::toLineStart; //清除询问与用户输入行
             if ($action == 'downgrade' ? strtolower($input) != 'y' : strtolower($input) == 'n') {
                 echo CliStyles::ColorRed . "已取消{$actionText}" . CliStyles::Reset . "\n";
                 return;
@@ -219,6 +222,7 @@ class miraiEzPluginsDogeManager
                 $plugin = $_plugins[$options['remove']];
                 echo CliStyles::ColorYellow . "确定要删除插件 " . CliStyles::ColorCyan . $plugin['name'] . CliStyles::ColorYellow . " 吗? (y/N) " . CliStyles::Reset;
                 $input = fgets(STDIN);
+                echo CliStyles::toPrevLine . CliStyles::clearLine . CliStyles::toLineStart; //清除询问与用户输入行
                 if (strtolower(trim($input)) !== 'y') {
                     echo CliStyles::ColorYellow . "已取消删除插件" . CliStyles::Reset . "\n";
                     return;
@@ -238,7 +242,7 @@ class miraiEzPluginsDogeManager
         } elseif (isset($options['update'])) {
             self::initPlugins();
             global $_plugins;
-            echo CliStyles::ColorCyan . "正在获取插件信息..." . CliStyles::Reset;
+            echo CliStyles::ColorYellow . "正在获取插件信息..." . CliStyles::Reset;
             //获取本地插件包名列表
             $packages = array_keys($_plugins);
             $resp = self::getPluginInfo($packages);
@@ -284,7 +288,7 @@ class miraiEzPluginsDogeManager
                     . CliStyles::ColorCyan . " v" . $resp['data'][$package]['version'] . ' ' .  CliStyles::Reset
                     . CliStyles::ColorMagenta . " (" . $package . ")"
                     . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $_plugins[$package]['description'] . "  "
-                    . CliStyles::Reset . "作者: " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
+                    . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
             }
 
             //无需更新插件
@@ -294,7 +298,7 @@ class miraiEzPluginsDogeManager
                     . CliStyles::ColorCyan . "  " . CliStyles::StyleInvert . " v" . $_plugins[$package]['version'] . ' ' . CliStyles::Reset
                     . CliStyles::ColorMagenta . " (" . $package . ")"
                     . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $_plugins[$package]['description'] . "  "
-                    . CliStyles::Reset . "作者: " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
+                    . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
             }
 
             //不可用插件
@@ -304,7 +308,7 @@ class miraiEzPluginsDogeManager
                     . CliStyles::ColorCyan . "  " . CliStyles::StyleInvert . " v" . $_plugins[$package]['version'] . ' ' . CliStyles::Reset
                     . CliStyles::ColorMagenta . " (" . $package . ")"
                     . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $_plugins[$package]['description'] . "  "
-                    . CliStyles::Reset . "作者: " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
+                    . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $_plugins[$package]['author'] . ' ' . CliStyles::Reset . "\n";
             }
 
             echo "\n";
@@ -313,12 +317,21 @@ class miraiEzPluginsDogeManager
                 return;
             }
 
+            echo CliStyles::ColorYellow . "是否更新? [Y/n] " . CliStyles::Reset;
+            $answer = trim(fgets(STDIN));
+            echo CliStyles::toPrevLine . CliStyles::clearLine . CliStyles::toLineStart; //清除询问与用户输入行
+            if (strtolower($answer) == 'n') {
+                echo CliStyles::ColorYellow . "已取消更新\n" . CliStyles::Reset;
+                return;
+            }
+
             foreach ($updatable as $package) {
                 echo CliStyles::StyleBold . CliStyles::ColorCyan . $_plugins[$package]['name'] . CliStyles::Reset . CliStyles::ColorYellow . " 更新中..." . CliStyles::Reset;
                 $result = self::installPlugin($package, $_plugins[$package]['file']);
                 echo CliStyles::clearLine . CliStyles::toLineStart; //清除当前行并回到行首
+                echo CliStyles::ColorCyan . $_plugins[$package]['name'] . ' ' . CliStyles::Reset;
                 if (is_string($result)) {
-                    echo CliStyles::ColorCyan . $_plugins[$package]['name'] . ' ' . CliStyles::ColorRed . $result . CliStyles::Reset . "\n";
+                    echo CliStyles::ColorRed . $result . CliStyles::Reset . "\n";
                     return;
                 }
                 switch ($result) {
@@ -339,6 +352,40 @@ class miraiEzPluginsDogeManager
                         //写入失败
                         echo CliStyles::ColorRed . "写入插件文件失败!" . CliStyles::Reset . "\n";
                 }
+            }
+        } elseif (isset($options['search'])) {
+            self::initPlugins();
+            echo CliStyles::ColorYellow . "正在从插件中心检索数据..." . CliStyles::Reset;
+            $payload = http_build_query(array(
+                'action' => 'search',
+                'query' => $options['search']
+            ));
+            $resp = CurlPOST($payload, self::_pluginsCenterAPI);
+            echo CliStyles::clearLine . CliStyles::toLineStart; //清除当前行并回到行首
+            if ($resp == '') {
+                echo CliStyles::ColorRed . "获取数据失败!" . CliStyles::Reset . "\n";
+                return;
+            }
+            $resp = json_decode($resp, true);
+            if ($resp === null) {
+                echo CliStyles::ColorRed . "解析返回数据失败!" . CliStyles::Reset . "\n";
+                return;
+            }
+            if ($resp['code'] != 200) {
+                echo CliStyles::ColorRed . "检索失败! 返回码: " . $resp['code'] . ", 消息: " . $resp['msg'] . CliStyles::Reset . "\n";
+                return;
+            }
+            $resultCount = count($resp['data']);
+            if ($resultCount == 0) {
+                echo CliStyles::ColorRed . "没有找到结果\n" . CliStyles::Reset;
+                return;
+            }
+            echo CliStyles::ColorGreen . "\n检索到 " . CliStyles::ColorCyan . CliStyles::StyleInvert . " $resultCount " . CliStyles::Reset . CliStyles::ColorGreen . " 个插件\n" . CliStyles::Reset;
+            foreach ($resp['data'] as $plugin) {
+                echo CliStyles::ColorCyan . $plugin['name'] . CliStyles::ColorCyan . "  " . CliStyles::StyleInvert . " v" . $plugin['version'] . ' ' . CliStyles::Reset
+                    . CliStyles::ColorMagenta . " (" . $plugin['package'] . ")"
+                    . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . $plugin['description'] . "  "
+                    . CliStyles::Reset . "作者 " . CliStyles::BgLightGreen . CliStyles::ColorBlack . ' ' . $plugin['author'] . ' ' . CliStyles::Reset . "\n";
             }
         } else {
             echo CliStyles::ColorRed . "参数错误, 使用 --help 查看帮助\n" . CliStyles::Reset;
