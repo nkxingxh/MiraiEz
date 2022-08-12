@@ -12,7 +12,7 @@ function autoAdapter($command = '', $content = array())
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
     $USE_HTTP = $webhooked
         || (!in_array($command, $WEBHOOK_FUNC))
-        || defined('webhook') == false
+        || (defined('webhook') == false || webhook == false)
         || defined("OneBot");
 
     if ($USE_HTTP) {
