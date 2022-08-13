@@ -149,16 +149,19 @@ function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '
  */
 function recall($messageId = true, $target = true, $sessionKey = '')
 {
-    if ($messageId === true && webhook) {
+    if (webhook) {
         global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $messageId = $_DATA['messageChain'][0]['id'];
-        else return false;
-    } else $messageId = (int) $messageId;
-    if ($target === true && webhook) {
-        global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
-        else $target = $_DATA['sender']['id'];
-    } else $target = (int) $target;
+        if ($messageId === true && webhook) {
+
+            if ($_DATA['type'] == 'GroupMessage') $messageId = $_DATA['messageChain'][0]['id'];
+            else return false;
+        } else $messageId = (int) $messageId;
+        if ($target === true && webhook) {
+            global $_DATA;
+            if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+            else $target = $_DATA['sender']['id'];
+        } else $target = (int) $target;
+    }
     if (empty($messageId) || empty($target)) return false;
     return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'messageId' => $messageId, 'target' => $target));
 }
