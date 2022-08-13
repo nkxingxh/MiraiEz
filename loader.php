@@ -1,5 +1,5 @@
 <?php
-if (defined('mdm')) { //如果在MDM中运行则定义全局变量
+if (defined('mdm_cli')) { //如果在 mdm_cli 中运行则定义全局变量
     global $baseDir, $dataDir;
 }
 $baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
