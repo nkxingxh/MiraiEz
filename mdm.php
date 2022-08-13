@@ -43,7 +43,7 @@ class miraiEzPluginsDogeManager
                 . CliStyles::ColorYellow . "\n--remove " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "卸载插件"
                 . CliStyles::ColorYellow . "\n--enable " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "启用插件"
                 . CliStyles::ColorYellow . "\n--disable " . CliStyles::ColorCyan . "<插件包名>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "禁用插件"
-                . CliStyles::ColorYellow . "\n--search " . CliStyles::ColorCyan . "<关键字>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "搜索插件"
+                . CliStyles::ColorYellow . "\n--search " . CliStyles::ColorCyan . "<关键字|*>" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "搜索插件"
                 . CliStyles::ColorYellow . "\n--update" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "更新插件"
                 . CliStyles::ColorYellow . "\n--list" . CliStyles::Reset . "  -  " . CliStyles::ColorGreen . "列出所有插件"
                 . CliStyles::ColorYellow .  "\n" . CliStyles::Reset;
