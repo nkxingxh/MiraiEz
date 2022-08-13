@@ -144,16 +144,23 @@ function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '
 
 /**
  * 撤回消息
- * @param int|bool $target  目标消息ID，当值为 TRUE 时则表示当前接收的消息
+ * @param int|bool $messageId 需要撤回的消息的 messageId, 传入 true 代表当前的消息 (默认值为 true)
+ * @param int|bool $target  好友id或群 id， 传入 true 代表当前消息发送者 或 消息所在群 (默认值为 true)
  */
-function recall($target = true, $sessionKey = '')
+function recall($messageId = true, $target = true, $sessionKey = '')
 {
-    if ($target === true) {
+    if ($messageId === true && webhook) {
         global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['messageChain'][0]['id'];
+        if ($_DATA['type'] == 'GroupMessage') $messageId = $_DATA['messageChain'][0]['id'];
         else return false;
+    } else $messageId = (int) $messageId;
+    if ($target === true && webhook) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        else $target = $_DATA['sender']['id'];
     } else $target = (int) $target;
-    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
+    if (empty($messageId) || empty($target)) return false;
+    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'messageId' => $messageId, 'target' => $target));
 }
 
 function friendList($sessionKey = '')
