@@ -10,6 +10,10 @@
 例如 http://localhost/webhook.php
 完成上述步骤后，请修改 config.php 中的相关设置。
 
+#### 注意
+
+loader.php 中第 5 行的 `$baseDir` 可根据需要进行修改，默认情况下 `$baseDir` 值为站点根目录。如果 MiraiEz 并不是在站点根目录下运行的，你可将其修改为 `$baseDir = __DIR__;`
+
 ## 插件开发
 
 将你编写的插件放入 plugins 文件夹即可自动加载
