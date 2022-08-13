@@ -176,6 +176,7 @@ function messageChain2FileId($messageChain = null)
  */
 function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 {
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     global $_DATA, $_ImageUrl;
     //在临时消息中,回复带有图片的消息会出 bug
     if ($quote === true && ($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0) == false) {
