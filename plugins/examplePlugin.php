@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 这个是示例插件
  * 
@@ -24,7 +25,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
     const _pluginAuthor = "nkxingxh";                       //插件作者
     const _pluginDescription = "示例插件";                  //插件描述
     const _pluginPackage = "top.nkxingxh.examplePlugin";    //插件包名 必须是唯一的 (如已加载相同包名的插件，将跳过当前插件类，不予加载)
-    const _pluginVersion = "1.0.0";                         //插件版本
+    const _pluginVersion = "1.1.0";                         //插件版本
 
     //构造函数, 目前没有用到，写不写这个函数都可以
     public function __construct()
@@ -65,7 +66,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
          * $_ImageUrl 全局变量，类型为 数组 (Array), 成员类型为 字符串 (String), 存储消息中图片的链接，使用前需要先通过 global 声明或者通过 $GLOBALS['_ImageUrl'] 调用
          * $_At 全局变量，类型为 数组 (Array), 成员类型为 整型 (int), 存储消息中被 @ 用户的 QQ 号，使用前需要先通过 global 声明或者通过 $GLOBALS['_At'] 调用
          */
-        global $_PlainText;
+        global $_PlainText, $_At, $_ImageUrl;
         if ($_PlainText == "/ping") {
             replyMessage("pong");   //使用 replyMessage 快速回复消息
             return;
@@ -99,6 +100,15 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
             return;
         }
 
+        if (trim($_PlainText) == '/ats') {
+            $msg = "At 的目标有: \n";
+            $n = count($_At);
+            for ($i = 0; $i < $n; $i++) {
+                $msg .= "QQ: " . $_At[$i] . "\n";
+            }
+            replyMessage($msg);
+        }
+
         if ($_PlainText == '/image') {
             $imgUrl = 'http://q1.qlogo.cn/g?b=qq&s=640&nk=' . $_DATA['sender']['id'];   //当前处理消息的发送者头像的 URL
 
@@ -123,7 +133,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
          * 为了方便开发与定位错误
          * 本框架有一定的日志记录功能, 可以通过 writeLog 函数记录日志
          */
-        if($_PlainText == '/log') {
+        if ($_PlainText == '/log') {
             /**
              * writeLog
              * 参数一: 日志内容 (string) (必须)
@@ -147,7 +157,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
          * 
          * 向机器人发送 /error, 你将可以直观地看到本框架的错误处理反馈
          */
-        if($_PlainText == '/error') {
+        if ($_PlainText == '/error') {
             //模拟一次错误
             $a = 1 / 0;
             return;
