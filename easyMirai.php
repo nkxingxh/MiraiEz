@@ -218,11 +218,11 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
             if (empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
             if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
                 $resp = HttpAdapter_verify();
-                if (!empty($resp['code']) && $resp['code'] == 0) {
+                if (isset($resp['code']) && $resp['code'] == 0) {
                     $session[$i]['session'] = $resp['session'];
                 }
                 $resp = HttpAdapter_bind($session[$i]['session'], $qq);
-                if (!empty($resp['code']) && $resp['code'] == 0) {
+                if (isset($resp['code']) && $resp['code'] == 0) {
                     file_put_contents($file, json_encode($session), LOCK_EX);
                     return $session[$i]['session'];
                 }
@@ -249,16 +249,18 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
 
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
     $resp = HttpAdapter_verify();
-    if (!empty($resp['code']) && $resp['code'] == 0) {
+    if (isset($resp['code']) && $resp['code'] == 0) {
+        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai');
         $data['session'] = $resp['session'];
     }
+    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai');
     $resp = HttpAdapter_bind($data['session'], $qq);
-    if (!empty($resp['code']) && $resp['code'] == 0) {
+    if (isset($resp['code']) && $resp['code'] == 0) {
         $session[$n] = $data;
         file_put_contents($file, json_encode($session), LOCK_EX);
         return $data['session'];
     }
-
+    writeLog("失败!", __FUNCTION__, 'easyMirai');
     return "";
 }
 

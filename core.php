@@ -39,7 +39,7 @@ function HttpAdapter($command, $content = array())
     //自动获取 sessionKey
     if (defined('bot') && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
-    } elseif (defined('webhook') == false) {
+    } elseif (defined('webhook') && webhook == false) {
         $content['sessionKey'] = getSessionKey();
     }
 
@@ -71,20 +71,23 @@ function HttpAdapter_verify()
     if (empty($resp)) {
         writeLog("解析数据失败", 'verify', 'core');
     } elseif ($resp['code'] != 0) {
-        writeLog("验证失败! 返回码: " . $resp['code'], 'verify', 'core');
+        writeLog("验证失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core');
+    } else {
+        writeLog("验证成功! session: " . $resp['session'], 'verify', 'core');
     }
     return $resp;
 }
 
 function HttpAdapter_bind($sessionKey, $qq)
 {
-    $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq));
+    $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq), JSON_UNESCAPED_UNICODE);
+    writeLog("请求内容: " . $data, 'bind', 'core');
     $resp = CurlPOST($data, httpApi . '/bind');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
         writeLog("解析数据失败", 'bind', 'core');
     } elseif ($resp['code'] != 0) {
-        writeLog("绑定失败! 返回码: " . $resp['code'], 'bind', 'core');
+        writeLog("绑定失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core');
     }
     return $resp;
 }
