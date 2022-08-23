@@ -249,11 +249,11 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
 
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
     $resp = HttpAdapter_verify();
-    if ($resp['code'] == 0) {
+    if (!empty($resp['code']) && $resp['code'] == 0) {
         $data['session'] = $resp['session'];
     }
     $resp = HttpAdapter_bind($data['session'], $qq);
-    if ($resp['code'] == 0) {
+    if (!empty($resp['code']) && $resp['code'] == 0) {
         $session[$n] = $data;
         file_put_contents($file, json_encode($session), LOCK_EX);
         return $data['session'];
