@@ -69,7 +69,9 @@ function HttpAdapter_verify()
     $resp = CurlPOST($data, httpApi . '/verify');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
+        writeLog("解析数据失败", 'verify', 'core');
     } elseif ($resp['code'] != 0) {
+        writeLog("验证失败! 返回码: " . $resp['code'], 'verify', 'core');
     }
     return $resp;
 }
@@ -80,7 +82,9 @@ function HttpAdapter_bind($sessionKey, $qq)
     $resp = CurlPOST($data, httpApi . '/bind');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
+        writeLog("解析数据失败", 'bind', 'core');
     } elseif ($resp['code'] != 0) {
+        writeLog("绑定失败! 返回码: " . $resp['code'], 'bind', 'core');
     }
     return $resp;
 }

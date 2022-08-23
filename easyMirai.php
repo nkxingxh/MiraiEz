@@ -217,12 +217,12 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
         if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq || empty($qq)) {
             if (empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
             if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
-                $res = HttpAdapter_verify();
-                if ($res['code'] == 0) {
-                    $session[$i]['session'] = $res['session'];
+                $resp = HttpAdapter_verify();
+                if (!empty($resp['code']) && $resp['code'] == 0) {
+                    $session[$i]['session'] = $resp['session'];
                 }
-                $res = HttpAdapter_bind($session[$i]['session'], $qq);
-                if ($res['code'] == 0) {
+                $resp = HttpAdapter_bind($session[$i]['session'], $qq);
+                if (!empty($resp['code']) && $resp['code'] == 0) {
                     file_put_contents($file, json_encode($session), LOCK_EX);
                     return $session[$i]['session'];
                 }
@@ -231,12 +231,12 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
             } else {    //定期释放 session 并重新申请 session (现在放到下面那一段去了)
                 /*HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
                 $data = array('qq' => $qq, 'session' => '', 'time' => time());
-                $res = HttpAdapter_verify();
-                if ($res['code'] == 0) {
-                    $data['session'] = $res['session'];
+                $resp = HttpAdapter_verify();
+                if ($resp['code'] == 0) {
+                    $data['session'] = $resp['session'];
                 }
-                $res = HttpAdapter_bind($data['session'], $qq);
-                if ($res['code'] == 0) {
+                $resp = HttpAdapter_bind($data['session'], $qq);
+                if ($resp['code'] == 0) {
                     $session[$i] = $data;
                     file_put_contents($file, json_encode($session), LOCK_EX);
                     return $data['session'];
@@ -248,12 +248,12 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
     }
 
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
-    $res = HttpAdapter_verify();
-    if ($res['code'] == 0) {
-        $data['session'] = $res['session'];
+    $resp = HttpAdapter_verify();
+    if ($resp['code'] == 0) {
+        $data['session'] = $resp['session'];
     }
-    $res = HttpAdapter_bind($data['session'], $qq);
-    if ($res['code'] == 0) {
+    $resp = HttpAdapter_bind($data['session'], $qq);
+    if ($resp['code'] == 0) {
         $session[$n] = $data;
         file_put_contents($file, json_encode($session), LOCK_EX);
         return $data['session'];
@@ -401,12 +401,12 @@ function compressedImage($OriginImage, $maxWidth = 2000, $maxHeight = 2000, $qua
             break;
     }
     unlink($imgsrc);        //删除源文件
-    if(empty($image)) return false;
+    if (empty($image)) return false;
     imagedestroy($image);   //释放内存
 
     $result = ($optType == 'png') ? imagepng($image_wp, $imgdst, $quality) : imagejpeg($image_wp, $imgdst, $quality);
     imagedestroy($image_wp);    //释放内存
-    
+
     if ($result) {
         $d = file_get_contents($imgdst);
         unlink($imgdst);
