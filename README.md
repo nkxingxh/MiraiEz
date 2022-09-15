@@ -63,7 +63,7 @@ easyMirai.php 中的函数则可以帮助你更快的编写插件。
     examplePlugin   v1.0.0   (top.nkxingxh.examplePlugin)  -  示例插件  作者  nkxingxh
     
 
-## OneBot 兼容
+## OneBot 兼容 (目前只支持频道)
 
 miraiez 现在可以兼容部分 OneBot 框架，
 相比其他 OneBot 框架来说， go-cqhttp 的兼容性是最好的。
