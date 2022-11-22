@@ -18,7 +18,7 @@ require_once "$baseDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '2.0.0');
+define("version", '2.1.0');
 
 require_once "core.php";
 
