@@ -133,15 +133,15 @@ function hookRegister($func, ...$types)
     global $_plugins, $_DATA;
 
     if (pfa) {
-        global $pfa_registeredFunc, $pfa_hookedFunc;
-        $pfa_registeredFunc++;  //已注册函数数量 +1
+        global $pfa_func_registered, $pfa_func_hooked;
+        $pfa_func_registered++;  //已注册函数数量 +1
     }
     foreach ($types as $type) {
         if ($type == $_DATA['type']) {      //仅当注册类型与 webhook 上报的类型一样时，才添加
             if (empty($GLOBALS['__pluginPackage__'])) $_plugins[pluginParent::_pluginPackage]['hooked'][] = $func;  //添加到空插件中
             else $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;  //挂钩类函数
 
-            if (pfa) $pfa_hookedFunc++;  //挂钩函数数量加 1
+            if (pfa) $pfa_func_hooked++;  //挂钩函数数量加 1
             return true;                //挂钩成功
             break;
         }
