@@ -4,23 +4,33 @@
  * 判断指定群是否存在指定成员
  * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
  * @param int $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
+ * 
+ * @return bool|null         如果该成员在群中返回 true 反之返回 false，失败返回 null
  */
-function isInGroup($groupID = null, $target = null, $sessionKey = null)
+function isInGroup($groupID = null, $target = null)
 {
     global $_DATA;
     if ($groupID === true) {
         if (!empty($_DATA['sender']['group']['id'])) $groupID = $_DATA['sender']['group']['id'];
-        else return false;
+        else return null;
     } else $groupID = (int) $groupID;
 
     if ($target === true) {
         if (!empty($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
-        else return false;
+        else return null;
     } else $target = (int) $target;
 
     $resp = memberList($groupID);
     if ($resp['code'] !== 0) {
+        return null;
     }
+
+    foreach ($resp['data'] as $v) {
+        if ($v['id'] == $target) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
