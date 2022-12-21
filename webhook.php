@@ -3,9 +3,8 @@ define("webhook", true);
 require_once "loader.php";
 header('content-type: application/json');
 
-$_DATA = json_decode(file_get_contents("php://input"), true);
-
 if (verifyAuthorization()) {
+    writeLog(file_get_contents("php://input"), '收到数据', 'webhook');
     $_DATA = json_decode(file_get_contents("php://input"), true);
 } else {
     if (!OneBot_auth()) {
@@ -27,10 +26,10 @@ if (isMessage($_DATA['type'])) {
 if (pfa) $pfa_pluginInitTime = microtime(true);
 require_once "plugins.php";
 loadPlugins();  //加载插件
+hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
 if (pfa) $pfa_pluginFuncTime = microtime(true);
 execPluginsFunction();  //执行插件函数
-hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
 if (pfa) pfa_end();
 
