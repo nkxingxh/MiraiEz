@@ -445,20 +445,25 @@ function check_gifcartoon($image_file)
 }
 
 /**
- * 为私聊会话或私聊启动 session
+ * 为私聊或群聊启动 session
+ * 
+ * @param bool $isolate_users   是否隔离不同用户的会话
+ * @param bool $isolate_groups  是否隔离不同群的会话
+ * @param bool $isolate_PG      是否隔离群聊和私聊消息 (当该参数为 false 时, $isolate_groups 参数不生效)
  */
-function mirai_session_start()
+function mirai_session_start($isolate_users = true, $isolate_groups = true, $isolate_PG = true)
 {
     if (defined('webhook') && webhook) {
         if (session_status() === PHP_SESSION_ACTIVE) {
             return true;
         }
         global $_DATA;
-
-        if ($_DATA['type'] == 'GroupMessage') {
-            $sid = 'G' . $_DATA['sender']['id'] . '-' . $_DATA['sender']['group']['id'];
+        $uid = $isolate_users ? $_DATA['sender']['id'] : '';
+        if ($_DATA['type'] == 'GroupMessage' && $isolate_PG) {
+            $gid = $isolate_groups ? $_DATA['sender']['group']['id'] : '';
+            $sid = 'G' . $uid . '-' . $gid;
         } else {
-            $sid = 'P' . $_DATA['sender']['id'];
+            $sid = 'P' . $uid;
         }
         session_id($sid);
         return session_start();
