@@ -16,6 +16,10 @@
 
 loader.php 中第 5 行的 `$baseDir` 可根据需要进行修改，默认情况下 `$baseDir` 值为站点根目录。如果 MiraiEz 并不是在站点根目录下运行的，你可将其修改为 `$baseDir = __DIR__;`
 
+由于 mirai-api-http V2.6.2 版本webhook似乎有点问题,如果无法使用请指定使用http调用 。
+> core.php 中第 18 行中  if ($USE_HTTP) 改为 if($USE_HTTP || true) 即可。
+> 但是这种方式会导致响应速度减缓,在Bug修复后应该修改回来。
+
 ## 插件开发
 
 将你编写的插件放入 plugins 文件夹即可自动加载
