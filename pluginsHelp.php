@@ -22,6 +22,8 @@ function getDataDir()
 
 function getConfig($configFile)
 {
+    $configFile = str_replace('./', '.', $configFile);
+    $configFile = str_replace('.\\', '.', $configFile);
     $file = dataDir . "/$configFile.json";
     if (!file_exists($file)) {
         saveFile($file, "[]");

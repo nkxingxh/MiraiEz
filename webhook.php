@@ -24,7 +24,7 @@ if (isMessage($_DATA['type'])) {
 }
 
 if (pfa) $pfa_pluginInitTime = microtime(true);
-require_once "plugins.php";
+require_once "plugins.php"; //插件依赖
 loadPlugins();  //加载插件
 hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
