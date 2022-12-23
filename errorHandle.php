@@ -19,7 +19,7 @@ set_exception_handler(function ($e) {
     }
 
     $msg = "在 " . $e->getFile() . " 中的第 " . $e->getLine() . " 行处发生异常 (" . $e->getCode() . ") : " . $e->getMessage();
-    writeLog($msg, 'Exception', 'errorHandle');
+    writeLog($msg, 'Exception', 'errorHandle', 3);
 
     //尝试回复消息给调试人员
     if (webhook) {
@@ -42,7 +42,7 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
         return;
     }
     $msg = "在 " . $errfile . " 中的第 " . $errline . " 行处发生错误 (" . $errno . ") : " . $errstr;
-    writeLog($msg, 'Error', 'errorHandle');
+    writeLog($msg, 'Error', 'errorHandle', 4);
 
     //尝试回复消息给调试人员
     if (webhook) {
@@ -75,7 +75,7 @@ register_shutdown_function(function () {
     }
 
     $msg = "在 " . $error['file'] . " 中的第 " . $error['line'] . " 行处发生致命错误 (" . $error['type'] . ") : " . $error['message'];
-    writeLog($msg, 'Fatal', 'errorHandle');
+    writeLog($msg, 'Fatal', 'errorHandle', 5);
 
     //尝试回复消息给调试人员
     if (webhook) {

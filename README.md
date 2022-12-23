@@ -12,13 +12,16 @@
 
 #### 注意
 
-请勿在 mirai-api-http 中开启单会话模式！
+1. 请勿在 mirai-api-http 中开启单会话模式！
 
-loader.php 中第 5 行的 `$baseDir` 可根据需要进行修改，默认情况下 `$baseDir` 值为站点根目录。如果 MiraiEz 并不是在站点根目录下运行的，你可将其修改为 `$baseDir = __DIR__;`
+1. loader.php 中第 5 行的 `$baseDir` 可根据需要进行修改，默认情况下 `$baseDir` 值为站点根目录。如果 MiraiEz 并不是在站点根目录下运行的，你可将其修改为 `$baseDir = __DIR__;`
 
-由于 mirai-api-http V2.6.2 版本webhook似乎有点问题,如果无法使用请指定使用http调用 。
-> core.php 中第 18 行中  if ($USE_HTTP) 改为 if($USE_HTTP || true) 即可。
-> 但是这种方式会导致响应速度减缓,在Bug修复后应该修改回来。
+1. 测试发现 mirai-api-http v2.6.2 的 webhook 适配器存在一些问题, 导致不执行 MiraiEz 通过其返回的命令。
+
+**临时解决方案**
+
+> 在 config.php 中将 adapter_always_use_http 改为 true 使 MiraiEz 只通过 HTTP 适配器发送命令即可。
+> 但该方式会导致响应时间变长, 在 Bug 修复后建议还原。
 
 ## 插件开发
 

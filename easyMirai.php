@@ -4,23 +4,33 @@
  * 判断指定群是否存在指定成员
  * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
  * @param int $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
+ * 
+ * @return bool|null         如果该成员在群中返回 true 反之返回 false，失败返回 null
  */
-function isInGroup($groupID = null, $target = null, $sessionKey = null)
+function isInGroup($groupID = null, $target = null)
 {
     global $_DATA;
     if ($groupID === true) {
         if (!empty($_DATA['sender']['group']['id'])) $groupID = $_DATA['sender']['group']['id'];
-        else return false;
+        else return null;
     } else $groupID = (int) $groupID;
 
     if ($target === true) {
         if (!empty($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
-        else return false;
+        else return null;
     } else $target = (int) $target;
 
     $resp = memberList($groupID);
     if ($resp['code'] !== 0) {
+        return null;
     }
+
+    foreach ($resp['data'] as $v) {
+        if ($v['id'] == $target) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -250,17 +260,17 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
     $resp = HttpAdapter_verify();
     if (isset($resp['code']) && $resp['code'] == 0) {
-        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai');
+        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai', 1);
         $data['session'] = $resp['session'];
     }
-    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai');
+    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai', 1);
     $resp = HttpAdapter_bind($data['session'], $qq);
     if (isset($resp['code']) && $resp['code'] == 0) {
         $session[$n] = $data;
         file_put_contents($file, json_encode($session), LOCK_EX);
         return $data['session'];
     }
-    writeLog("失败!", __FUNCTION__, 'easyMirai');
+    writeLog("失败!", __FUNCTION__, 'easyMirai', 1);
     return "";
 }
 
@@ -435,20 +445,25 @@ function check_gifcartoon($image_file)
 }
 
 /**
- * 为私聊会话或私聊启动 session
+ * 为私聊或群聊启动 session
+ * 
+ * @param bool $isolate_users   是否隔离不同用户的会话
+ * @param bool $isolate_groups  是否隔离不同群的会话
+ * @param bool $isolate_PG      是否隔离群聊和私聊消息 (当该参数为 false 时, $isolate_groups 参数不生效)
  */
-function mirai_session_start()
+function mirai_session_start($isolate_users = true, $isolate_groups = true, $isolate_PG = true)
 {
     if (defined('webhook') && webhook) {
         if (session_status() === PHP_SESSION_ACTIVE) {
             return true;
         }
         global $_DATA;
-
-        if ($_DATA['type'] == 'GroupMessage') {
-            $sid = 'G' . $_DATA['sender']['id'] . '-' . $_DATA['sender']['group']['id'];
+        $uid = $isolate_users ? $_DATA['sender']['id'] : '';
+        if ($_DATA['type'] == 'GroupMessage' && $isolate_PG) {
+            $gid = $isolate_groups ? $_DATA['sender']['group']['id'] : '';
+            $sid = 'G' . $uid . '-' . $gid;
         } else {
-            $sid = 'P' . $_DATA['sender']['id'];
+            $sid = 'P' . $uid;
         }
         session_id($sid);
         return session_start();

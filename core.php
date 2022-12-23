@@ -6,11 +6,11 @@
  */
 function autoAdapter($command = '', $content = array())
 {
-    writeLog("$command => " . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'Adapter');
+    writeLog("$command => " . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'adapter', 1);
     global $webhooked;
     //可以使用 webhook 的命令
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
-    $USE_HTTP = $webhooked
+    $USE_HTTP = $webhooked || adapter_always_use_http
         || (!in_array($command, $WEBHOOK_FUNC))
         || (defined('webhook') == false || webhook == false)
         || defined("OneBot");
@@ -30,7 +30,7 @@ function HttpAdapter($command, $content = array())
 {
     //OneBot Bridge
     if (defined("OneBot")) {
-        writeLog("转交给 OneBot_API_bridge 处理", "HttpAdapter", "OneBot");
+        writeLog("转交给 OneBot_API_bridge 处理", __FUNCTION__, "OneBot", 1);
         return OneBot_API_bridge($command, $content);
     }
 
@@ -69,11 +69,11 @@ function HttpAdapter_verify()
     $resp = CurlPOST($data, httpApi . '/verify');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
-        writeLog("解析数据失败", 'verify', 'core');
+        writeLog("解析数据失败", 'verify', 'core', 1);
     } elseif ($resp['code'] != 0) {
-        writeLog("验证失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core');
+        writeLog("验证失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core', 1);
     } else {
-        writeLog("验证成功! session: " . $resp['session'], 'verify', 'core');
+        writeLog("验证成功! session: " . $resp['session'], 'verify', 'core', 1);
     }
     return $resp;
 }
@@ -81,13 +81,13 @@ function HttpAdapter_verify()
 function HttpAdapter_bind($sessionKey, $qq)
 {
     $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq), JSON_UNESCAPED_UNICODE);
-    writeLog("请求内容: " . $data, 'bind', 'core');
+    writeLog("请求内容: " . $data, 'bind', 'core', 1);
     $resp = CurlPOST($data, httpApi . '/bind');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
-        writeLog("解析数据失败", 'bind', 'core');
+        writeLog("解析数据失败", 'bind', 'core', 1);
     } elseif ($resp['code'] != 0) {
-        writeLog("绑定失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core');
+        writeLog("绑定失败! 响应: " . json_encode($resp, JSON_UNESCAPED_UNICODE), 'bind', 'core', 1);
     }
     return $resp;
 }

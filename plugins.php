@@ -51,8 +51,8 @@ function loadPlugins($dir = 'plugins')
     $_plugins_count_load = 0;                    //加载插件计数器
 
     $GLOBALS['__pluginFile__'] = "plugins.php";
-    pluginRegister(new pluginParent);           //注册一个空插件，用于挂钩全局函数
-    unset($_plugins[pluginParent::_pluginPackage]['object']); //删除空插件对象
+    pluginRegister(new pluginParent);           //注册一个空插件，用于挂钩全局函数 (兼容 v1 插件)
+    unset($_plugins[pluginParent::_pluginPackage]['object']); //删除空插件对象, 使得执行挂钩函数时在全局寻找
 
     //if (defined('mdm_cli')) echo "开始遍历插件目录...\n";
     //遍历所有插件文件
@@ -66,7 +66,7 @@ function loadPlugins($dir = 'plugins')
         if (is_file("$pluginsDir/$__pluginFile__")) {
             //if (defined('mdm_cli')) echo "是插件文件\n";
             $GLOBALS['__pluginFile__'] = $__pluginFile__;       //设置当前插件文件名
-            $GLOBALS['__pluginPackage__'] = pluginParent::_pluginPackage; //设置当前插件包名
+            $GLOBALS['__pluginPackage__'] = pluginParent::_pluginPackage; //当前插件包名先设置为父插件 (用于兼容 v1 的直接函数挂钩插件)
             include "$pluginsDir/$__pluginFile__";              //加载插件文件
         } else {
             //if (defined('mdm_cli')) echo "不是文件\n";
@@ -109,8 +109,9 @@ function pluginRegister($pluginClass)
     if (pluginIsEnable($__pluginPackage__, $GLOBALS['__pluginFile__'])) {
         $_plugins[$__pluginPackage__]['hooked'] = array();
         //初始化插件
-        if ($pluginClass->_init() === false) {
-            $_plugins[$__pluginPackage__]['hooked'] = false;  //插件初始化失败
+        if ($pluginClass->_init() === false) {                      //插件初始化失败
+            $_plugins[$__pluginPackage__]['hooked'] = false;
+            $_plugins[$__pluginPackage__]['object'] = null;
         } else {
             //计数器
             $_plugins_count_load++;
@@ -138,8 +139,11 @@ function hookRegister($func, ...$types)
     }
     foreach ($types as $type) {
         if ($type == $_DATA['type']) {      //仅当注册类型与 webhook 上报的类型一样时，才添加
-            if (empty($GLOBALS['__pluginPackage__'])) $_plugins[pluginParent::_pluginPackage]['hooked'][] = $func;  //添加到空插件中
-            else $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;  //挂钩类函数
+            if (empty($GLOBALS['__pluginPackage__'])) {
+                $_plugins[pluginParent::_pluginPackage]['hooked'][] = $func;    //添加到空插件中 (v1 插件)
+            } else {
+                $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;   //挂钩对象中的方法 (v2 插件)
+            }
 
             if (pfa) $pfa_func_hooked++;  //挂钩函数数量加 1
             return true;                //挂钩成功
@@ -170,14 +174,18 @@ function execPluginsFunction()
     global $_plugins, $_DATA;                          //插件列表，数据
     global $_plugins_count_exec;                       //执行插件计数器
     $_plugins_count_exec = 0;                           //初始化计数器
+    global $__pluginPackage__;                          //当前正在执行的插件
     foreach ($_plugins as $__plugin__) {            //遍历已注册的插件列表
         if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) { //判断是否已挂钩
+            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);
+            $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : "pluginParent";
             foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
                 $_plugins_count_exec++;                               //计数器加1
-                if (isset($__plugin__['object']) && is_object($__plugin__['object']))  //判断插件对象是否存在
+                if ($inObject) { //判断插件对象是否存在
                     $return_code = $__plugin__['object']->$__hooked_func__($_DATA);
-                else
+                } else {
                     $return_code = $__hooked_func__($_DATA);
+                }
 
                 //拦截
                 if (isset($return_code) && $return_code === 1)
@@ -188,4 +196,14 @@ function execPluginsFunction()
     }
     //返回计数器
     return $_plugins_count_exec;
+}
+
+/**
+ * 获取当前插件身份
+ * 
+ * @return string|bool 成功则返回插件包名，失败则返回 false
+ */
+function plugin_whoami()
+{
+    return empty($GLOBALS['__pluginPackage__']) ? false : $GLOBALS['__pluginPackage__'];
 }

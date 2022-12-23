@@ -112,14 +112,14 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
             null
     );
 
-    writeLog(json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, "OneBot");
+    writeLog(json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
 
     //不在处理范围内，不予处理
     if (is_array($allowType) && empty($type) != true) {
         if (!in_array($type, $allowType)) return false;
     } elseif ($allowType !== true) return false;
 
-    writeLog("上报类型 $type 在处理范围内, 开始转换消息类型", '11mirai', 'OneBot');
+    writeLog("上报类型 $type 在处理范围内, 开始转换消息类型", '11mirai', 'OneBot', 1);
 
     switch ($d['post_type']) {
         case 'message':
@@ -186,7 +186,7 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
                     }*/
                     if($d['user_id'] == $d['self_tiny_id']) return false;
 
-                    writeLog("正在处理频道消息", 'Guild', 'OneBot');
+                    writeLog("正在处理频道消息", 'Guild', 'OneBot', 1);
 
                     $messageChain = OneBot_message2chain($d['message'], $d['message_id'], $d['time']);
                     if ($sub_type == 'channel') {
@@ -636,7 +636,7 @@ function OneBot_CQEscapeBack($str, $comma = false)
 
 function OneBot_API_bridge($command, $content = array())
 {
-    writeLog($command . ' => ' . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot');
+    writeLog($command . ' => ' . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
     if (defined("OneBot")) {
         writeLog("转交给 OneBot_API_bridge_11 处理", '', "OneBot");
         if (OneBot === 11) return OneBot_API_bridge_11($command, $content);
@@ -675,17 +675,17 @@ function OneBot_API_bridge_11($command, $content = array())
 
 function OneBot_API_11($command, $d = array())
 {
-    writeLog($command . ' => ' . json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot');
+    writeLog($command . ' => ' . json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
 
     $d = json_encode($d);
     $header = array('Content-Type: application/json');
     if (!empty(OneBot11_access_token)) $header[] = "Authorization: Bearer " . OneBot11_access_token;
 
     $url = OneBot11_HTTP_API . '/' . $command;
-    writeLog($d, $url, 'OneBot');
+    writeLog($d, $url, 'OneBot', 1);
 
     $resp = CurlPOST($d, $url, '', '', $header);
-    writeLog($resp, 'OneBot_API_11', 'OneBot');
+    writeLog($resp, 'OneBot_API_11', 'OneBot', 1);
 
     $resp = json_decode($resp, true);
     return $resp;

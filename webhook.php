@@ -4,11 +4,11 @@ require_once "loader.php";
 header('content-type: application/json');
 
 if (verifyAuthorization()) {
-    writeLog(file_get_contents("php://input"), '收到数据', 'webhook');
+    writeLog(file_get_contents("php://input"), '收到数据', 'webhook', 1);
     $_DATA = json_decode(file_get_contents("php://input"), true);
 } else {
     if (!OneBot_auth()) {
-        header('HTTP/1.1 403 Forbidden');
+        http_response_code(403);
         exit;
     }
 }
@@ -24,7 +24,7 @@ if (isMessage($_DATA['type'])) {
 }
 
 if (pfa) $pfa_pluginInitTime = microtime(true);
-require_once "plugins.php";
+require_once "plugins.php"; //插件依赖
 loadPlugins();  //加载插件
 hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
