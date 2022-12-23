@@ -1,7 +1,15 @@
 <?php
 
-function writeLog($content, $module = '', $logfilename = 'core')
+function writeLog($content, $module = '', $logfilename = '')
 {
+    if (defined('webhook') && webhook) {
+        if ($package = plugin_whoami()) {
+            $logfilename = $package;
+        } else $logfilename = 'pluginParent';
+    } elseif (empty($logfilename)) $logfilename = 'MiraiEz';
+
+    if (empty($module) && !empty(__FUNCTION__)) $module = __FUNCTION__;
+
     $fileName = baseDir . "/logs/$logfilename.log";
     makeDir(dirname($fileName));
     file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . "]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
@@ -20,10 +28,21 @@ function getDataDir()
     return $dir;
 }
 
-function getConfig($configFile)
+function getConfig($configFile = '')
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
+    if (defined('webhook') && webhook) {
+        if ($package = plugin_whoami()) {
+            if (plugins_data_isolation) {
+                if (empty($configFile)) $configFile = 'config';
+                $configFile = $package . '/' . $configFile;
+            } else {
+                if (empty($configFile)) $configFile = $package;
+            }
+        } else return false;
+    } elseif (empty($configFile)) return false;
+
     $file = dataDir . "/$configFile.json";
     if (!file_exists($file)) {
         saveFile($file, "[]");
@@ -35,8 +54,23 @@ function getConfig($configFile)
     return $config;
 }
 
-function saveConfig($configFile, $config, $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
+function saveConfig($configFile = '', $config, $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
 {
+    $configFile = str_replace('./', '.', $configFile);
+    $configFile = str_replace('.\\', '.', $configFile);
+    if (defined('webhook') && webhook) {
+        if ($package = plugin_whoami()) {
+            if (plugins_data_isolation) {
+                if (empty($configFile)) $configFile = 'config';
+                $configFile = $package . '/' . $configFile;
+            } else {
+                if (empty($configFile)) $configFile = $package;
+            }
+        } else return false;
+    } elseif (empty($configFile)) return false;
+
+    $configFile = str_replace('./', '.', $configFile);
+    $configFile = str_replace('.\\', '.', $configFile);
     $file = dataDir . "/$configFile.json";
     return saveFile($file, json_encode($config, $jsonEncodeFlags));
 }
