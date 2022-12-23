@@ -4,7 +4,7 @@ require_once "loader.php";
 header('content-type: application/json');
 
 if (verifyAuthorization()) {
-    writeLog(file_get_contents("php://input"), '收到数据', 'webhook');
+    writeLog(file_get_contents("php://input"), '收到数据', 'webhook', 1);
     $_DATA = json_decode(file_get_contents("php://input"), true);
 } else {
     if (!OneBot_auth()) {
