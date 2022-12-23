@@ -7,7 +7,7 @@
 
 class miraiEzPluginsDogeManager
 {
-    const _version = "1.1.0";
+    const _version = "1.2.0";
     const _pluginsCenterAPI = "https://api.nkxingxh.top/miraiez/plugins.php";
 
     //构造函数
@@ -203,16 +203,23 @@ class miraiEzPluginsDogeManager
                 case 0:
                     //获取失败
                     echo CliStyles::ColorRed . "获取插件数据失败!" . CliStyles::Reset . "\n";
-                    return;
+                    break;
                 case -1:
                     //解析失败
                     echo CliStyles::ColorRed . "解析返回数据失败!" . CliStyles::Reset . "\n";
+                    break;
                 case -2:
                     //校验失败
                     echo CliStyles::ColorRed . "插件内容校验失败!" . CliStyles::Reset . "\n";
+                    break;
                 case -3:
                     //写入失败
                     echo CliStyles::ColorRed . "写入插件文件失败!" . CliStyles::Reset . "\n";
+                    break;
+                case -4:
+                    //获取插件内容失败
+                    echo CliStyles::ColorRed . "获取插件内容失败!" . CliStyles::Reset . "\n";
+                    break;
             }
             return;
         } elseif (isset($options['remove'])) {
@@ -341,16 +348,23 @@ class miraiEzPluginsDogeManager
                     case 0:
                         //获取失败
                         echo CliStyles::ColorRed . "获取插件数据失败!" . CliStyles::Reset . "\n";
-                        return;
+                        break;
                     case -1:
                         //解析失败
                         echo CliStyles::ColorRed . "解析返回数据失败!" . CliStyles::Reset . "\n";
+                        break;
                     case -2:
                         //校验失败
                         echo CliStyles::ColorRed . "插件内容校验失败!" . CliStyles::Reset . "\n";
+                        break;
                     case -3:
                         //写入失败
                         echo CliStyles::ColorRed . "写入插件文件失败!" . CliStyles::Reset . "\n";
+                        break;
+                    case -4:
+                        //获取插件内容失败
+                        echo CliStyles::ColorRed . "获取插件内容失败!" . CliStyles::Reset . "\n";
+                        break;
                 }
             }
         } elseif (isset($options['search'])) {
@@ -450,12 +464,22 @@ class miraiEzPluginsDogeManager
             //服务器错误
             return "服务器返回错误, 返回码: " . $resp['code'] . ", 消息: " . $resp['msg'];
         }
-        $plugin_content = base64_decode($resp['data']['file']);
+
+        if (empty($resp['data']['file'])) {
+            if (empty($resp['data']['url'])) return -4;  //获取插件内容失败
+            $plugin_content = CurlGET($resp['data']['url']);
+        } else {
+            $plugin_content = base64_decode($resp['data']['file']);
+        }
+
+        if (empty($plugin_content)) return -4;  //获取插件内容失败
+
         //校验文件
-        if (md5($plugin_content) != $resp['data']['md5']) {
+        if (!empty($resp['data']['md5']) && md5($plugin_content) != $resp['data']['md5']) {
             //文件校验失败
             return -2;
         }
+
         //写入文件
         if (empty($file)) $file = $package . '.php';
         $file = "plugins/" . $file;
