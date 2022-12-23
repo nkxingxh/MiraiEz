@@ -7,3 +7,5 @@ define('admin_qq', 1234567890);                     //填写用于管理机器�
 
 $debug_groups = [123456789];                        //启用调试的群组
 $debug_friends = [1234567890];                      //启用调试的好友
+
+define("adapter_always_use_http", false);           //只使用 HTTP 适配器

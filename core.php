@@ -10,7 +10,7 @@ function autoAdapter($command = '', $content = array())
     global $webhooked;
     //可以使用 webhook 的命令
     $WEBHOOK_FUNC = array('sendFriendMessage', 'sendGroupMessage', 'sendTempMessage', 'sendNudge', 'resp_newFriendRequestEvent', 'resp_memberJoinRequestEvent', 'resp_botInvitedJoinGroupRequestEvent');
-    $USE_HTTP = $webhooked
+    $USE_HTTP = $webhooked || adapter_always_use_http
         || (!in_array($command, $WEBHOOK_FUNC))
         || (defined('webhook') == false || webhook == false)
         || defined("OneBot");
