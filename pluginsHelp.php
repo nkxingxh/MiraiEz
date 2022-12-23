@@ -1,18 +1,45 @@
 <?php
 
-function writeLog($content, $module = '', $logfilename = '')
+/**
+ * 写出日志
+ * @param string    $content       日志内容
+ * @param string    $module        模块
+ * @param string    $logfilename   日志文件名，不需要 .log
+ * @param int       $level          日志级别 (1 DEBUG, 2 INFO, 3 WARN, 4 ERROR, 5 FATAL)
+ */
+function writeLog($content, $module = '', $logfilename = '', $level = 2)
 {
+    if($level < logging_level) return;
     if (empty($logfilename) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             $logfilename = $package;
         } else $logfilename = 'pluginParent';
     } elseif (empty($logfilename)) $logfilename = 'MiraiEz';
-
     if (empty($module) && !empty(__FUNCTION__)) $module = __FUNCTION__;
+
+    switch ($level) {
+        case 1:
+            $level = 'DEBUG';
+            break;
+        case 2:
+            $level = 'INFO';
+            break;
+        case 3:
+            $level = 'WARN';
+            break;
+        case 4:
+            $level = 'ERROR';
+            break;
+        case 5:
+            $level = 'FATAL';
+            break;
+        default:
+            $level = 'UNKNOWN';
+    }
 
     $fileName = baseDir . "/logs/$logfilename.log";
     makeDir(dirname($fileName));
-    file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . "]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
+    file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . " $level]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
 }
 
 function getDataDir()

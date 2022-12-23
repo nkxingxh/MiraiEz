@@ -260,17 +260,17 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
     $resp = HttpAdapter_verify();
     if (isset($resp['code']) && $resp['code'] == 0) {
-        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai');
+        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai', 1);
         $data['session'] = $resp['session'];
     }
-    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai');
+    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai', 1);
     $resp = HttpAdapter_bind($data['session'], $qq);
     if (isset($resp['code']) && $resp['code'] == 0) {
         $session[$n] = $data;
         file_put_contents($file, json_encode($session), LOCK_EX);
         return $data['session'];
     }
-    writeLog("失败!", __FUNCTION__, 'easyMirai');
+    writeLog("失败!", __FUNCTION__, 'easyMirai', 1);
     return "";
 }
 

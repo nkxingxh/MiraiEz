@@ -39,6 +39,6 @@ function pfa_end()
         }
 
         //输出性能分析结果
-        writeLog($msg, $_DATA['type'], 'pfa');
+        writeLog($msg, $_DATA['type'], 'pfa', 2);
     }
 }
