@@ -2,8 +2,8 @@
 
 function writeLog($content, $module = '', $logfilename = '')
 {
-    if (defined('webhook') && webhook) {
-        if ($package = plugin_whoami()) {
+    if (empty($logfilename) && defined('webhook') && webhook) {
+        if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             $logfilename = $package;
         } else $logfilename = 'pluginParent';
     } elseif (empty($logfilename)) $logfilename = 'MiraiEz';
@@ -32,8 +32,8 @@ function getConfig($configFile = '')
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
-    if (defined('webhook') && webhook) {
-        if ($package = plugin_whoami()) {
+    if (empty($configFile) && defined('webhook') && webhook) {
+        if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             if (plugins_data_isolation) {
                 if (empty($configFile)) $configFile = 'config';
                 $configFile = $package . '/' . $configFile;
@@ -58,8 +58,8 @@ function saveConfig($configFile = '', $config, $jsonEncodeFlags = JSON_UNESCAPED
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
-    if (defined('webhook') && webhook) {
-        if ($package = plugin_whoami()) {
+    if (empty($configFile) && defined('webhook') && webhook) {
+        if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             if (plugins_data_isolation) {
                 if (empty($configFile)) $configFile = 'config';
                 $configFile = $package . '/' . $configFile;

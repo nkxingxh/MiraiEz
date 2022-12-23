@@ -109,8 +109,9 @@ function pluginRegister($pluginClass)
     if (pluginIsEnable($__pluginPackage__, $GLOBALS['__pluginFile__'])) {
         $_plugins[$__pluginPackage__]['hooked'] = array();
         //初始化插件
-        if ($pluginClass->_init() === false) {
-            $_plugins[$__pluginPackage__]['hooked'] = false;  //插件初始化失败
+        if ($pluginClass->_init() === false) {                      //插件初始化失败
+            $_plugins[$__pluginPackage__]['hooked'] = false;
+            $_plugins[$__pluginPackage__]['object'] = null;
         } else {
             //计数器
             $_plugins_count_load++;
@@ -138,17 +139,9 @@ function hookRegister($func, ...$types)
     }
     foreach ($types as $type) {
         if ($type == $_DATA['type']) {      //仅当注册类型与 webhook 上报的类型一样时，才添加
-            if (empty($GLOBALS['__pluginPackage__']) || empty($_plugins[$GLOBALS['__pluginPackage__']]['object'])) {
-                if (!function_exists($func)) {
-                    throw new Exception("Try to hook a function that does not exist"/*, 1*/);
-                    return false;
-                }
+            if (empty($GLOBALS['__pluginPackage__'])) {
                 $_plugins[pluginParent::_pluginPackage]['hooked'][] = $func;    //添加到空插件中 (v1 插件)
             } else {
-                if (!method_exists($_plugins[$GLOBALS['__pluginPackage__']]['object'], $func)) {
-                    throw new Exception("Try to hook a method that does not exist"/*, 1*/);
-                    return false;
-                }
                 $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;   //挂钩对象中的方法 (v2 插件)
             }
 
