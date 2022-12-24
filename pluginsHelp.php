@@ -15,7 +15,6 @@ function writeLog($content, $module = '', $logfilename = '', $level = 2)
             $logfilename = $package;
         } else $logfilename = 'pluginParent';
     } elseif (empty($logfilename)) $logfilename = 'MiraiEz';
-    if (empty($module) && !empty(__FUNCTION__)) $module = __FUNCTION__;
 
     switch ($level) {
         case 1:
