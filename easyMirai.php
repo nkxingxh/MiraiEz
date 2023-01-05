@@ -189,9 +189,9 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     global $_DATA, $_ImageUrl;
     //在临时消息中,回复带有图片的消息会出 bug
-    if ($quote === true && ($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0) == false) {
+    if ($quote === true && isset($_DATA['messageChain'][0]['id']) && ($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0) == false) {
         $quote = $_DATA['messageChain'][0]['id'];
-    }
+    } else $quote = (int) $quote;
     $at = in_array($_DATA['type'], ['GroupMessage', 'GuildChannelMessage']) ? ($at === true ? $_DATA['sender']['id'] : $at) : 0;
     if (webhook) {
         if ($_DATA['type'] == 'FriendMessage') {
@@ -204,6 +204,9 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
         } elseif ($_DATA['type'] == 'GuildChannelMessage') {
             if (!empty($at)) $messageChain = array_merge([getMessageChain_At($at)], $messageChain);
             return sendGuildChannelMessage($_DATA['sender']['guild']['id'], $_DATA['sender']['guild']['channel']['id'], $messageChain, $quote);
+        } elseif (isset($_DATA['member']['group']['id'])) {  //其他可能的群消息/事件
+            if (!empty($at)) $messageChain = array_merge([getMessageChain_At($at)], $messageChain);
+            return sendGroupMessage($_DATA['member']['group']['id'], $messageChain, $quote, $sessionKey);
         } else return false;
     } else return false;
 }
