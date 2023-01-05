@@ -26,7 +26,13 @@ function autoAdapter($command = '', $content = array())
     }
 }
 
-function HttpAdapter($command, $content = array())
+/**
+ * HTTP 适配器
+ * @param string $command 命令字
+ * @param array $content 参数内容
+ * @param bool $post 是否使用POST方法
+ */
+function HttpAdapter($command, $content = array(), $post = null)
 {
     //OneBot Bridge
     if (defined("OneBot")) {
@@ -46,7 +52,7 @@ function HttpAdapter($command, $content = array())
     $error = 0;
     do {
         //判断命令应该使用 GET 还是 POST 方式
-        if (in_array($command, $FUNC_GET)) {
+        if (($post === null) ? in_array($command, $FUNC_GET) : (!$post)) {
             $query = http_build_query($content);
             $resp = CurlGET(httpApi . "/$command?$query");
         } else {
@@ -156,19 +162,17 @@ function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '
  */
 function recall($messageId = true, $target = true, $sessionKey = '')
 {
-    if (webhook) {
-        global $_DATA;
-        if ($messageId === true && webhook) {
+    if (defined('webhook') && webhook) global $_DATA;
+    if ($messageId === true) {
+        if (isset($_DATA['messageChain'][0]['id'])) $messageId = $_DATA['messageChain'][0]['id'];
+        else return false;
+    } else $messageId = (int) $messageId;
+    if ($target === true) {
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        elseif (isset($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
+        else return false;
+    } else $target = (int) $target;
 
-            if ($_DATA['type'] == 'GroupMessage') $messageId = $_DATA['messageChain'][0]['id'];
-            else return false;
-        } else $messageId = (int) $messageId;
-        if ($target === true && webhook) {
-            global $_DATA;
-            if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
-            else $target = $_DATA['sender']['id'];
-        } else $target = (int) $target;
-    }
     if (empty($messageId) || empty($target)) return false;
     return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'messageId' => $messageId, 'target' => $target));
 }
@@ -185,12 +189,46 @@ function groupList($sessionKey = '')
 
 function memberList($target = true, $sessionKey = '')
 {
+    if (defined('webhook') && webhook) global $_DATA;
     if ($target === true) {
-        global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
+        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
         else return false;
     } else $target = (int) $target;
-    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
+}
+
+/**
+ * 获取/修改群员设置
+ * @param int $target 指定群的群号
+ * @param int $memberId 群员QQ号
+ * @param array $info 要设置的群员资料
+ */
+function memberInfo($target = true, $memberId = true, $info = array(), $sessionKey = '')
+{
+    if (defined('webhook') && webhook) global $_DATA;
+    if ($target === true) {
+        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
+        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    if ($memberId === true) {
+        if (isset($_DATA['sender']['id'])) $memberId = $_DATA['sender']['id'];
+        elseif (isset($_DATA['member']['id'])) $memberId = $_DATA['member']['id'];
+        else return false;
+    } else $memberId = (int) $memberId;
+
+    if (empty($info)) return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target,
+        'memberId' => $memberId
+    ), false);
+    else return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target,
+        'memberId' => $memberId,
+        'info' => $info
+    ), true);
 }
 
 /**
