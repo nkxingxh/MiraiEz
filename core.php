@@ -42,6 +42,7 @@ function HttpAdapter($command, $content = array(), $post = null)
 
     //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
+    $FUNC_FROM_DATA = array('file/upload');
     //自动获取 sessionKey
     if (defined('bot') && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
@@ -56,8 +57,14 @@ function HttpAdapter($command, $content = array(), $post = null)
             $query = http_build_query($content);
             $resp = CurlGET(httpApi . "/$command?$query");
         } else {
-            $data = json_encode($content);
-            $resp = CurlPOST($data, httpApi . "/$command");
+            if (in_array($command, $FUNC_FROM_DATA)) {
+                $file = $content['file'];
+                $data = json_encode($content);
+                $resp = CurlPOST($data, httpApi . "/$command", '',  '', '', '', $file);
+            } else {
+                $data = json_encode($content);
+                $resp = CurlPOST($data, httpApi . "/$command");
+            }
         }
         $resp = json_decode($resp, true);
 
@@ -382,6 +389,30 @@ function file_rename($id = true, $renameTo = null, $target = null, $group = null
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
+        'sessionKey' => $sessionKey
+    ));
+}
+
+
+/**
+ * 群文件上传
+ * 
+ * @param string $file          上传的文件
+ * @param string $path          上传目录的id, 空串为上传到根目录
+ * @param string $target        上传目标群号
+ * @param string $type          当前仅支持 "group"
+ * @param string $sessionKey    已经激活的Session
+ */
+function file_upload($file = array(), $path = '', $target = null, $type = "group", $sessionKey = '')
+{
+    if (empty($file) || $target === null) {
+        return false;
+    }
+    return autoAdapter(__FUNCTION__, array(
+        'file' => $file,
+        'path' => $path,
+        'target' => $target,
+        'type' => $type,
         'sessionKey' => $sessionKey
     ));
 }

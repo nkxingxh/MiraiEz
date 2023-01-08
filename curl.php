@@ -33,7 +33,7 @@ function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(
     return $response;
 }
 
-function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $fromData = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -56,11 +56,21 @@ function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array()
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
 
     //适配 gzip 压缩
     curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
-
+    //适配文件上传
+    if (!empty($fromData)) {
+        $postFiles = array();
+        foreach ($fromData as $key => $value) {
+            writeLog($key.$value,__FUNCTION__,'curl',1);
+            $post_data = json_decode($post_data,true);
+            $cfile = curl_file_create($value,null,$key);
+            $post_data['file'] = $cfile;
+        }
+        writeLog(json_encode($fromData),__FUNCTION__,'curl',1);
+    }
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;

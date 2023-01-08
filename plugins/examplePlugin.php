@@ -198,5 +198,32 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
                     . "\n你的等级: " . $resp['level']
             );
         }
+        /**
+         * 上传文件到群内
+         */
+        if ($_PlainText == '/file/upload') {
+            $imgUrl = 'http://q1.qlogo.cn/g?b=qq&s=640&nk=' . $_DATA['sender']['id'];   //当前处理消息的发送者头像的 URL
+
+            if ($_DATA['type'] == 'GroupMessage') {
+                file_upload(
+                    array($_DATA['sender']['id'] . "的头像.jpg" => $imgUrl),
+                    '',
+                    $_DATA['sender']['group']['id']
+                );
+                $messageChain = getMessageChain("尝试将这张图片上传到群文件", $imgUrl);
+                sendGroupMessage($_DATA['sender']['group']['id'], $messageChain);
+            } else {
+                /**
+                 * 创建消息链
+                 * 第一个参数 (PlainText) 为消息链中的文本消息 (字符串)
+                 * 第二个参数 (ImageUrl) 为消息链中图片的链接 (可以是数组)
+                 * 第三个参数 (AtTarget ) 为消息链中要 @ 的 QQ 号 (可以是数组) 
+                 * 注意: 只有群消息回复才支持 @, 如果在非群消息 @, 有可能导致消息发送失败
+                 */
+                $messageChain = getMessageChain("这是文本内容, 并且本消息包含一张图片", $imgUrl);
+                sendFriendMessage($_DATA['sender']['id'], $messageChain);
+            }
+        }
+    }
     }
 });
