@@ -225,5 +225,4 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
             }
         }
     }
-    }
 });
