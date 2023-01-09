@@ -25,7 +25,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
     const _pluginAuthor = "nkxingxh";                       //插件作者
     const _pluginDescription = "示例插件";                  //插件描述
     const _pluginPackage = "top.nkxingxh.examplePlugin";    //插件包名 必须是唯一的 (如已加载相同包名的插件，将跳过当前插件类，不予加载)
-    const _pluginVersion = "1.1.0";                         //插件版本
+    const _pluginVersion = "1.2.0";                         //插件版本
 
     //构造函数, 目前没有用到，写不写这个函数都可以
     public function __construct()
@@ -198,31 +198,14 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
                     . "\n你的等级: " . $resp['level']
             );
         }
-        /**
-         * 上传文件到群内
-         */
-        if ($_PlainText == '/file/upload') {
-            $imgUrl = 'http://q1.qlogo.cn/g?b=qq&s=640&nk=' . $_DATA['sender']['id'];   //当前处理消息的发送者头像的 URL
 
-            if ($_DATA['type'] == 'GroupMessage') {
-                file_upload(
-                    array($_DATA['sender']['id'] . "的头像.jpg" => $imgUrl),
-                    '',
-                    $_DATA['sender']['group']['id']
-                );
-                $messageChain = getMessageChain("尝试将这张图片上传到群文件", $imgUrl);
-                sendGroupMessage($_DATA['sender']['group']['id'], $messageChain);
-            } else {
-                /**
-                 * 创建消息链
-                 * 第一个参数 (PlainText) 为消息链中的文本消息 (字符串)
-                 * 第二个参数 (ImageUrl) 为消息链中图片的链接 (可以是数组)
-                 * 第三个参数 (AtTarget ) 为消息链中要 @ 的 QQ 号 (可以是数组) 
-                 * 注意: 只有群消息回复才支持 @, 如果在非群消息 @, 有可能导致消息发送失败
-                 */
-                $messageChain = getMessageChain("这是文本内容, 并且本消息包含一张图片", $imgUrl);
-                sendFriendMessage($_DATA['sender']['id'], $messageChain);
-            }
+        //上传群文件
+        if ($_PlainText == '/file_upload') {
+            $fileUrl = 'http://q1.qlogo.cn/g?b=qq&s=640&nk=' . $_DATA['sender']['id'];   //当前处理消息的发送者头像的 URL
+            $fileName = $_DATA['sender']['id'] . '的头像_' . time() . '.jpg';
+            $cFile = curl_file_create($fileUrl, null, $fileName);   //创建cURL文件对象
+            $resp = file_upload(true, true, '', $cFile);
+            replyMessage("已尝试上传你的头像至群文件");
         }
     }
 });

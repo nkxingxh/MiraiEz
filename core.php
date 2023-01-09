@@ -30,9 +30,10 @@ function autoAdapter($command = '', $content = array())
  * HTTP 适配器
  * @param string $command 命令字
  * @param array $content 参数内容
- * @param bool $post 是否使用POST方法
+ * @param bool $post 是否使用 POST 方法
+ * @param bool $json 是否使用 JSON 编码 (仅限 POST)
  */
-function HttpAdapter($command, $content = array(), $post = null)
+function HttpAdapter($command, $content = array(), $post = null, $json = true)
 {
     //OneBot Bridge
     if (defined("OneBot")) {
@@ -42,7 +43,6 @@ function HttpAdapter($command, $content = array(), $post = null)
 
     //使用 GET 请求的命令
     $FUNC_GET = array('countMessage', 'fetchMessage', 'fetchLatestMessage', 'peekMessage', 'peekLatestMessage', 'about', 'messageFromId', 'friendList', 'groupList', 'memberList', 'botProfile', 'friendProfile', 'memberProfile', 'file/list', 'file/info', 'groupConfig', 'memberInfo');
-    $FUNC_FROM_DATA = array('file/upload');
     //自动获取 sessionKey
     if (defined('bot') && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
@@ -54,18 +54,16 @@ function HttpAdapter($command, $content = array(), $post = null)
     do {
         //判断命令应该使用 GET 还是 POST 方式
         if (($post === null) ? in_array($command, $FUNC_GET) : (!$post)) {
-            $query = http_build_query($content);
-            $resp = CurlGET(httpApi . "/$command?$query");
+            $url = httpApi . "/$command?" . http_build_query($content);
+            writeLog('GET: ' . $url, __FUNCTION__, 'adapter', 1);
+            $resp = CurlGET($url);
         } else {
-            if (in_array($command, $FUNC_FROM_DATA)) {
-                $file = $content['file'];
-                $data = json_encode($content);
-                $resp = CurlPOST($data, httpApi . "/$command", '',  '', '', '', $file);
-            } else {
-                $data = json_encode($content);
-                $resp = CurlPOST($data, httpApi . "/$command");
-            }
+            $url = httpApi . "/$command";
+            $payload = $json ? json_encode($content) : $content;
+            writeLog('POST: ' . $url, __FUNCTION__, 'adapter', 1);
+            $resp = CurlPOST($payload, $url);
         }
+        writeLog('Resp: ' . $resp, __FUNCTION__, 'adapter', 1);
         $resp = json_decode($resp, true);
 
         if (isset($resp['code']) && $resp['code'] == 3) {
@@ -393,26 +391,33 @@ function file_rename($id = true, $renameTo = null, $target = null, $group = null
     ));
 }
 
-
 /**
  * 群文件上传
- * 
- * @param string $file          上传的文件
+ * @param string $type          当前仅支持 "group" (传入 true 指定为当前类型)
+ * @param string $target        上传目标群号 (传入 true 指定为当前群)
  * @param string $path          上传目录的id, 空串为上传到根目录
- * @param string $target        上传目标群号
- * @param string $type          当前仅支持 "group"
+ * @param string $file          要上传的文件地址 (支持本地文件与URL)
  * @param string $sessionKey    已经激活的Session
  */
-function file_upload($file = array(), $path = '', $target = null, $type = "group", $sessionKey = '')
+function file_upload($type = 'group', $target = null, $path = '', $file, $sessionKey = '')
 {
-    if (empty($file) || $target === null) {
-        return false;
+    if (defined('webhook') && webhook) {
+        global $_DATA;
+        if (isset($_DATA['sender']['group']['id'])) {
+            $type = ($type === true) ? 'group' : $type;
+            $target = ($target === true) ? $_DATA['sender']['group']['id'] : ((int) $target);
+        } elseif (isset($_DATA['member']['group']['id'])) {
+            $type = ($type === true) ? 'group' : $type;
+            $target = ($target === true) ? $_DATA['member']['group']['id'] : ((int) $target);
+        }
     }
-    return autoAdapter(__FUNCTION__, array(
+    if (empty($file) || $target <= 0) return false;
+    writeLog("尝试上传文件至 $type => $target", __FUNCTION__, 'core', 1);
+    return HttpAdapter('file/upload', array(
         'file' => $file,
         'path' => $path,
         'target' => $target,
         'type' => $type,
         'sessionKey' => $sessionKey
-    ));
+    ), true, false);
 }

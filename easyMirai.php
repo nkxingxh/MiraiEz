@@ -474,3 +474,21 @@ function mirai_session_start($isolate_users = true, $isolate_groups = true, $iso
         return false;
     }
 }
+
+/**
+ * 获取当前消息发送者 (或事件触发者) 的 qq
+ * @return int|false
+ */
+function getCurrentSenderId()
+{
+
+}
+
+/**
+ * 获取当前 webhook 上报的群号
+ * @return int|false
+ */
+function getCurrentGroupId()
+{
+
+}

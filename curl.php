@@ -1,6 +1,6 @@
 <?php
 
-function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(), $UserAgent = 'miraiez')
+function CurlGET($url, $cookie = '', $referer = '', $header = '', $setopt = array(), $UserAgent = 'miraiez')
 {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -9,8 +9,8 @@ function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(
         curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if ($header != '')
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     #关闭SSL
@@ -33,16 +33,18 @@ function CurlGET($url, $cookie = '', $ifurl = '', $header = '', $setopt = array(
     return $response;
 }
 
-function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $fromData = array(), $UserAgent = 'miraiez')
+function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
+    writeLog('URL: ' . $url, __FUNCTION__, 'curl', 1);
+    writeLog('Payload: ' . (is_array($payload) ? ('(Array) ' . json_encode($payload, JSON_UNESCAPED_UNICODE)) : $payload), __FUNCTION__, 'curl', 1);
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (count($header) > 0)
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     if (!empty($setopt) && is_array($setopt)) {
@@ -56,27 +58,19 @@ function CurlPOST($post_data, $url, $cookie = '', $ifurl = '', $header = array()
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
 
     //适配 gzip 压缩
     curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
-    //适配文件上传
-    if (!empty($fromData)) {
-        $postFiles = array();
-        foreach ($fromData as $key => $value) {
-            writeLog($key.$value,__FUNCTION__,'curl',1);
-            $post_data = json_decode($post_data,true);
-            $cfile = curl_file_create($value,null,$key);
-            $post_data['file'] = $cfile;
-        }
-        writeLog(json_encode($fromData),__FUNCTION__,'curl',1);
-    }
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
+
     $response = curl_exec($curl);
     curl_close($curl);
+
+    writeLog('Resp: ' . $response, __FUNCTION__, 'curl', 1);
     return $response;
 }
 
-function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -84,8 +78,8 @@ function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $set
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (count($header) > 0)
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     if (!empty($setopt) && is_array($setopt)) {
@@ -99,13 +93,13 @@ function CurlPUT($data, $url, $cookie = '', $ifurl = '', $header = array(), $set
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
 }
 
-function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -113,8 +107,8 @@ function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $s
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (count($header) > 0)
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     if (!empty($setopt) && is_array($setopt)) {
@@ -128,13 +122,13 @@ function CurlPATCH($data, $url, $cookie = '', $ifurl = '', $header = array(), $s
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PATCH");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
 }
 
-function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -142,8 +136,8 @@ function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (count($header) > 0)
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     if (!empty($setopt) && is_array($setopt)) {
@@ -157,13 +151,13 @@ function CurlDELETE($data, $url, $cookie = '', $ifurl = '', $header = array(), $
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
 }
 
-function Curl($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function Curl($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
@@ -171,8 +165,8 @@ function Curl($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (count($header) > 0)
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    if ($ifurl != '')
-        curl_setopt($curl, CURLOPT_REFERER, $ifurl);
+    if ($referer != '')
+        curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
     #关闭SSL
@@ -180,7 +174,7 @@ function Curl($data, $url, $cookie = '', $ifurl = '', $header = array(), $setopt
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
     #返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
 
     if (!empty($setopt) && is_array($setopt)) {
         foreach ($setopt as $value) {
