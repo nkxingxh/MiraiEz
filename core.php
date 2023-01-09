@@ -22,7 +22,7 @@ function autoAdapter($command = '', $content = array())
         $command = str_replace('/', '_', $command);     //命令格式转换
         echo json_encode(array('command' => $command, 'content' => $content));
         $webhooked = true;
-        return array('code' => 200, 'msg' => 'OK');
+        return array('code' => 0, 'msg' => 'success');
     }
 }
 
