@@ -394,29 +394,29 @@ function file_rename($id = true, $renameTo = null, $target = null, $group = null
 /**
  * 群文件上传
  * @param string $type          当前仅支持 "group" (传入 true 指定为当前类型)
- * @param string $target        上传目标群号 (传入 true 指定为当前群)
+ * @param int $target           上传目标群号 (传入 true 指定为当前群)
  * @param string $path          上传目录的id, 空串为上传到根目录
- * @param string $file          要上传的文件地址 (支持本地文件与URL)
- * @param string $sessionKey    已经激活的Session
+ * @param string $file          cURL 文件对象
+ * @param string $sessionKey    已经激活的 Session
  */
 function file_upload($type = 'group', $target = null, $path = '', $file, $sessionKey = '')
 {
     if (defined('webhook') && webhook) {
         global $_DATA;
         if (isset($_DATA['sender']['group']['id'])) {
-            $type = ($type === true) ? 'group' : $type;
-            $target = ($target === true) ? $_DATA['sender']['group']['id'] : ((int) $target);
+            if ($type === true) $type = 'group';
+            if ($target === true) $target = $_DATA['sender']['group']['id'];
         } elseif (isset($_DATA['member']['group']['id'])) {
-            $type = ($type === true) ? 'group' : $type;
-            $target = ($target === true) ? $_DATA['member']['group']['id'] : ((int) $target);
+            if ($type === true) $type = 'group';
+            if ($target === true) $target = $_DATA['member']['group']['id'];
         }
     }
-    if (empty($file) || $target <= 0) return false;
+    if (empty($file) || $target <= 0 || !is_string($type)) return false;
     writeLog("尝试上传文件至 $type => $target", __FUNCTION__, 'core', 1);
     return HttpAdapter('file/upload', array(
         'file' => $file,
         'path' => $path,
-        'target' => $target,
+        'target' => (int) $target,
         'type' => $type,
         'sessionKey' => $sessionKey
     ), true, false);
