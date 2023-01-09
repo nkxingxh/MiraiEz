@@ -481,14 +481,18 @@ function mirai_session_start($isolate_users = true, $isolate_groups = true, $iso
  */
 function getCurrentSenderId()
 {
-
+    if (isset($GLOBALS['_DATA']['sender']['id'])) return $GLOBALS['_DATA']['sender']['id'];
+    if (isset($GLOBALS['_DATA']['member']['id'])) return $GLOBALS['_DATA']['member']['id'];
+    return false;
 }
 
 /**
- * 获取当前 webhook 上报的群号
+ * 获取当前 webhook 上报的群号 (或事件触发所在群)
  * @return int|false
  */
 function getCurrentGroupId()
 {
-
+    if (isset($GLOBALS['_DATA']['sender']['group']['id'])) return $GLOBALS['_DATA']['sender']['group']['id'];
+    if (isset($GLOBALS['_DATA']['member']['group']['id'])) return $GLOBALS['_DATA']['member']['group']['id'];
+    return false;
 }
