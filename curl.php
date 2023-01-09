@@ -35,8 +35,10 @@ function CurlGET($url, $cookie = '', $referer = '', $header = '', $setopt = arra
 
 function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
 {
-    writeLog('URL: ' . $url, __FUNCTION__, 'curl', 1);
-    writeLog('Payload: ' . (is_array($payload) ? ('(Array) ' . json_encode($payload, JSON_UNESCAPED_UNICODE)) : $payload), __FUNCTION__, 'curl', 1);
+    if (logging_level == 1) {
+        writeLog('URL: ' . $url, __FUNCTION__, 'curl', 1);
+        writeLog('Payload: ' . (is_array($payload) ? ('(Array) ' . json_encode($payload, JSON_UNESCAPED_UNICODE)) : $payload), __FUNCTION__, 'curl', 1);
+    }
     $header = is_array($header) ? $header : array();
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
