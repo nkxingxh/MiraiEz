@@ -1,4 +1,4 @@
-# miraiez
+# MiraiEz
 
 ![](https://img.shields.io/github/license/nkxingxh/miraiez.svg)
 
