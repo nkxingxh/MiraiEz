@@ -23,10 +23,10 @@ if (verifyAuthorization()) {
     }
 }
 
-// Webhook 消息预处理
-$webhooked = false;
+$webhooked = false;     //标记是否已使用 webhook 返回
 define("bot", (int) $_SERVER['HTTP_BOT']);
 
+// Webhook 消息预处理
 if (isMessage($_DATA['type'])) {
     $_PlainText = messageChain2PlainText($_DATA['messageChain']);
     $_ImageUrl = messageChain2ImageUrl($_DATA['messageChain']);
