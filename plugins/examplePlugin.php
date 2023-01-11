@@ -204,7 +204,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
             $fileUrl = 'http://q1.qlogo.cn/g?b=qq&s=640&nk=' . $_DATA['sender']['id'];   //当前处理消息的发送者头像的 URL
             $fileName = $_DATA['sender']['id'] . '的头像_' . time() . '.jpg';
             $cFile = curl_file_create($fileUrl, null, $fileName);   //创建cURL文件对象
-            $resp = file_upload(true, true, '', $cFile);
+            $resp = file_upload($cFile);
             replyMessage("已尝试上传你的头像至群文件");
         }
     }

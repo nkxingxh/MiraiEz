@@ -184,19 +184,25 @@ function recall($messageId = true, $target = true, $sessionKey = '')
     return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'messageId' => $messageId, 'target' => $target));
 }
 
-/**文件操作 */
+/**文件操作 与 多媒体内容上传*/
 
 /**
  * 获取文件信息
  */
-function file_info($id = true, $target = null, $group = null, $qq = null, $withDownloadInfo = false, $sessionKey = '')
+function file_info($id = true, $path = null, $target = true, $group = null, $qq = null, $withDownloadInfo = false, $sessionKey = '')
 {
     if ($id === true) {
         $id = messageChain2FileId();
         if ($id === false) return false;
     }
+    if ($target === true) {
+        if (isset($GLOBALS['_DATA']['sender']['group']['id'])) $target = $GLOBALS['_DATA']['sender']['group']['id'];
+        elseif (isset($GLOBALS['_DATA']['sender']['id'])) $target = $GLOBALS['_DATA']['sender']['id'];
+        else return false;
+    }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
+        'path' => $path,
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
@@ -205,11 +211,17 @@ function file_info($id = true, $target = null, $group = null, $qq = null, $withD
     ));
 }
 
-function file_mkdir($id, $directoryName, $target = null, $group = null, $qq = null, $sessionKey = '')
+function file_mkdir($id, $directoryName, $path = null, $target = true, $group = null, $qq = null, $sessionKey = '')
 {
+    if ($target === true) {
+        if (isset($GLOBALS['_DATA']['sender']['group']['id'])) $target = $GLOBALS['_DATA']['sender']['group']['id'];
+        elseif (isset($GLOBALS['_DATA']['sender']['id'])) $target = $GLOBALS['_DATA']['sender']['id'];
+        else return false;
+    }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'directoryName' => $directoryName,
+        'path' => $path,
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
@@ -217,14 +229,20 @@ function file_mkdir($id, $directoryName, $target = null, $group = null, $qq = nu
     ));
 }
 
-function file_delete($id = true, $target = null, $group = null, $qq = null, $sessionKey = '')
+function file_delete($id = true, $path = null, $target = true, $group = null, $qq = null, $sessionKey = '')
 {
     if ($id === true) {
         $id = messageChain2FileId();
         if ($id === false) return false;
     }
+    if ($target === true) {
+        if (isset($GLOBALS['_DATA']['sender']['group']['id'])) $target = $GLOBALS['_DATA']['sender']['group']['id'];
+        elseif (isset($GLOBALS['_DATA']['sender']['id'])) $target = $GLOBALS['_DATA']['sender']['id'];
+        else return false;
+    }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
+        'path' => $path,
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
@@ -232,15 +250,22 @@ function file_delete($id = true, $target = null, $group = null, $qq = null, $ses
     ));
 }
 
-function file_move($id = true, $moveTo = null, $target = null, $group = null, $qq = null, $sessionKey = '')
+function file_move($id = true, $moveTo = null, $path = null, $moveToPath = null, $target = true, $group = null, $qq = null, $sessionKey = '')
 {
     if ($id === true) {
         $id = messageChain2FileId();
         if ($id === false) return false;
+    }
+    if ($target === true) {
+        if (isset($GLOBALS['_DATA']['sender']['group']['id'])) $target = $GLOBALS['_DATA']['sender']['group']['id'];
+        elseif (isset($GLOBALS['_DATA']['sender']['id'])) $target = $GLOBALS['_DATA']['sender']['id'];
+        else return false;
     }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'moveTo' => $moveTo,
+        'path' => $path,
+        'moveToPath' => $moveToPath,
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
@@ -248,15 +273,21 @@ function file_move($id = true, $moveTo = null, $target = null, $group = null, $q
     ));
 }
 
-function file_rename($id = true, $renameTo = null, $target = null, $group = null, $qq = null, $sessionKey = '')
+function file_rename($id = true, $renameTo = null, $path = null, $target = true, $group = null, $qq = null, $sessionKey = '')
 {
     if ($id === true) {
         $id = messageChain2FileId();
         if ($id === false) return false;
     }
+    if ($target === true) {
+        if (isset($GLOBALS['_DATA']['sender']['group']['id'])) $target = $GLOBALS['_DATA']['sender']['group']['id'];
+        elseif (isset($GLOBALS['_DATA']['sender']['id'])) $target = $GLOBALS['_DATA']['sender']['id'];
+        else return false;
+    }
     return autoAdapter(__FUNCTION__, array(
         'id' => $id,
         'renameTo' => $renameTo,
+        'path' => $path,
         'target' => ($target === null) ? null : ((int) $target),
         'group' => ($group === null) ? null : ((int) $group),
         'qq' => ($qq === null) ? null : ((int) $qq),
@@ -269,10 +300,10 @@ function file_rename($id = true, $renameTo = null, $target = null, $group = null
  * @param string $type          当前仅支持 "group" (传入 true 指定为当前类型)
  * @param int $target           上传目标群号 (传入 true 指定为当前群)
  * @param string $path          上传目录的id, 空串为上传到根目录
- * @param string $file          cURL 文件对象
+ * @param CURLFile $file          cURL 文件对象
  * @param string $sessionKey    已经激活的 Session
  */
-function file_upload($type = 'group', $target = null, $path = '', $file, $sessionKey = '')
+function file_upload($file, $path = '', $type = 'group', $target = true, $sessionKey = '')
 {
     if (defined('webhook') && webhook) {
         global $_DATA;
