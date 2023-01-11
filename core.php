@@ -114,6 +114,8 @@ function HttpAdapter_release($sessionKey, $qq)
     return $resp;
 }
 
+/**消息发送与撤回 */
+
 /**
  * 发送好友消息
  */
@@ -182,136 +184,7 @@ function recall($messageId = true, $target = true, $sessionKey = '')
     return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'messageId' => $messageId, 'target' => $target));
 }
 
-function friendList($sessionKey = '')
-{
-    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
-}
-
-function groupList($sessionKey = '')
-{
-    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
-}
-
-function memberList($target = true, $sessionKey = '')
-{
-    if (defined('webhook') && webhook) global $_DATA;
-    if ($target === true) {
-        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
-        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
-        else return false;
-    } else $target = (int) $target;
-    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
-}
-
-/**
- * 获取/修改群员设置
- * @param int $target 指定群的群号
- * @param int $memberId 群员QQ号
- * @param array $info 要设置的群员资料
- */
-function memberInfo($target = true, $memberId = true, $info = array(), $sessionKey = '')
-{
-    if (defined('webhook') && webhook) global $_DATA;
-    if ($target === true) {
-        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
-        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
-        else return false;
-    } else $target = (int) $target;
-    if ($memberId === true) {
-        if (isset($_DATA['sender']['id'])) $memberId = $_DATA['sender']['id'];
-        elseif (isset($_DATA['member']['id'])) $memberId = $_DATA['member']['id'];
-        else return false;
-    } else $memberId = (int) $memberId;
-
-    if (empty($info)) return HttpAdapter(__FUNCTION__, array(
-        'sessionKey' => $sessionKey,
-        'target' => $target,
-        'memberId' => $memberId
-    ), false);
-    else return HttpAdapter(__FUNCTION__, array(
-        'sessionKey' => $sessionKey,
-        'target' => $target,
-        'memberId' => $memberId,
-        'info' => $info
-    ), true);
-}
-
-/**
- * 处理 添加好友申请 事件
- * @see https://github.com/project-mirai/mirai-api-http/blob/master/docs/api/API.md#添加好友申请
- */
-function resp_newFriendRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
-{
-    global $_DATA;
-    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
-        if ($eventId === true) $eventId = $_DATA['eventId'];
-        if ($fromId === true) $fromId = $_DATA['fromId'];
-        if ($groupId === true) $groupId = $_DATA['groupId'];
-    }
-
-    return autoAdapter(__FUNCTION__, array(
-        'eventId' => (int) $eventId,
-        'fromId' => (int) $fromId,
-        'groupId' => (int) $groupId,
-        'operate' => (int) $operate,
-        'message' => $message,
-        'sessionKey' => $sessionKey
-    ));
-}
-
-/**
- * 处理 用户入群申请 事件
- */
-function resp_memberJoinRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
-{
-    global $_DATA;
-    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
-        if ($eventId === true) $eventId = $_DATA['eventId'];
-        if ($fromId === true) $fromId = $_DATA['fromId'];
-        if ($groupId === true) $groupId = $_DATA['groupId'];
-    }
-
-    return autoAdapter(__FUNCTION__, array(
-        'eventId' => (int) $eventId,
-        'fromId' => (int) $fromId,
-        'groupId' => (int) $groupId,
-        'operate' => (int) $operate,
-        'message' => $message,
-        'sessionKey' => $sessionKey
-    ));
-}
-
-/**
- * 处理 Bot被邀请入群申请 事件
- */
-function resp_botInvitedJoinGroupRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
-{
-    global $_DATA;
-    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
-        if ($eventId === true) $eventId = $_DATA['eventId'];
-        if ($fromId === true) $fromId = $_DATA['fromId'];
-        if ($groupId === true) $groupId = $_DATA['groupId'];
-    }
-
-    return autoAdapter(__FUNCTION__, array(
-        'eventId' => (int) $eventId,
-        'fromId' => (int) $fromId,
-        'groupId' => (int) $groupId,
-        'operate' => (int) $operate,
-        'message' => $message,
-        'sessionKey' => $sessionKey
-    ));
-}
-
-function groupConfig($target = true, $sessionKey = '')
-{
-    if ($target === true) {
-        global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
-        else return false;
-    } else $target = (int) $target;
-    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
-}
+/**文件操作 */
 
 /**
  * 获取文件信息
@@ -420,4 +293,141 @@ function file_upload($type = 'group', $target = null, $path = '', $file, $sessio
         'type' => $type,
         'sessionKey' => $sessionKey
     ), true, false);
+}
+
+/**获取账号信息 与 账号管理 */
+
+function friendList($sessionKey = '')
+{
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
+}
+
+function groupList($sessionKey = '')
+{
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey));
+}
+
+function memberList($target = true, $sessionKey = '')
+{
+    if (defined('webhook') && webhook) global $_DATA;
+    if ($target === true) {
+        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
+        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
+}
+
+/**
+ * 获取/修改群员设置
+ * @param int $target 指定群的群号
+ * @param int $memberId 群员QQ号
+ * @param array $info 要设置的群员资料
+ */
+function memberInfo($target = true, $memberId = true, $info = array(), $sessionKey = '')
+{
+    if (defined('webhook') && webhook) global $_DATA;
+    if ($target === true) {
+        if (isset($_DATA['sender']['group']['id'])) $target = $_DATA['sender']['group']['id'];
+        elseif (isset($_DATA['member']['group']['id'])) $target = $_DATA['member']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    if ($memberId === true) {
+        if (isset($_DATA['sender']['id'])) $memberId = $_DATA['sender']['id'];
+        elseif (isset($_DATA['member']['id'])) $memberId = $_DATA['member']['id'];
+        else return false;
+    } else $memberId = (int) $memberId;
+
+    if (empty($info)) return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target,
+        'memberId' => $memberId
+    ), false);
+    else return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target,
+        'memberId' => $memberId,
+        'info' => $info
+    ), true);
+}
+
+/**群管理 */
+
+function groupConfig($target = true, $sessionKey = '')
+{
+    if ($target === true) {
+        global $_DATA;
+        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        else return false;
+    } else $target = (int) $target;
+    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
+}
+
+/**事件处理 */
+
+/**
+ * 处理 添加好友申请 事件
+ * @see https://github.com/project-mirai/mirai-api-http/blob/master/docs/api/API.md#添加好友申请
+ */
+function resp_newFriendRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
+{
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+/**
+ * 处理 用户入群申请 事件
+ */
+function resp_memberJoinRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
+{
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
+}
+
+/**
+ * 处理 Bot被邀请入群申请 事件
+ */
+function resp_botInvitedJoinGroupRequestEvent($operate, $eventId = true, $fromId = true, $groupId = true, $message = "", $sessionKey = '')
+{
+    global $_DATA;
+    if ($_DATA['type'] == 'BotInvitedJoinGroupRequestEvent') {
+        if ($eventId === true) $eventId = $_DATA['eventId'];
+        if ($fromId === true) $fromId = $_DATA['fromId'];
+        if ($groupId === true) $groupId = $_DATA['groupId'];
+    }
+
+    return autoAdapter(__FUNCTION__, array(
+        'eventId' => (int) $eventId,
+        'fromId' => (int) $fromId,
+        'groupId' => (int) $groupId,
+        'operate' => (int) $operate,
+        'message' => $message,
+        'sessionKey' => $sessionKey
+    ));
 }
