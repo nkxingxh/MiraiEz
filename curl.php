@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -8,14 +9,15 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-function CurlGET($url, $cookie = '', $referer = '', $header = '', $setopt = array(), $UserAgent = 'miraiez')
+function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
     if ($UserAgent != "")
         curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if ($header != '')
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -41,17 +43,17 @@ function CurlGET($url, $cookie = '', $referer = '', $header = '', $setopt = arra
     return $response;
 }
 
-function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     if (logging_level == 1) {
         writeLog('URL: ' . $url, __FUNCTION__, 'curl', 1);
         writeLog('Payload: ' . (is_array($payload) ? ('(Array) ' . json_encode($payload, JSON_UNESCAPED_UNICODE)) : $payload), __FUNCTION__, 'curl', 1);
     }
-    $header = is_array($header) ? $header : array();
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if (count($header) > 0)
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -80,13 +82,13 @@ function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array()
     return $response;
 }
 
-function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $header = is_array($header) ? $header : array();
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if (count($header) > 0)
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -109,13 +111,13 @@ function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(),
     return $response;
 }
 
-function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $header = is_array($header) ? $header : array();
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if (count($header) > 0)
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -138,13 +140,13 @@ function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(
     return $response;
 }
 
-function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $header = is_array($header) ? $header : array();
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if (count($header) > 0)
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
@@ -167,13 +169,13 @@ function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array
     return $response;
 }
 
-function Curl($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'miraiez')
+function Curl($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $header = is_array($header) ? $header : array();
+    $header = is_array($header) ? $header : array($header);
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
-    if (count($header) > 0)
+    if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')
         curl_setopt($curl, CURLOPT_REFERER, $referer);
