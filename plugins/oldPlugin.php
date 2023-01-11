@@ -1,5 +1,14 @@
 <?php
 /**
+ * MiraiEz Copyright (c) 2021-2023 NKXingXh
+ * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
+ * This is free software: you are free to change and redistribute it.
+ * There is NO WARRANTY, to the extent permitted by law.
+ * 
+ * Github: https://github.com/nkxingxh/MiraiEz
+ */
+
+/**
  * 这个是 v1 的示例插件，现已不推荐使用
  * 请查看 examplePlugin.php 文件
  */

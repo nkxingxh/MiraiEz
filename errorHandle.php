@@ -1,4 +1,13 @@
 <?php
+/**
+ * MiraiEz Copyright (c) 2021-2023 NKXingXh
+ * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
+ * This is free software: you are free to change and redistribute it.
+ * There is NO WARRANTY, to the extent permitted by law.
+ * 
+ * Github: https://github.com/nkxingxh/MiraiEz
+ */
+
 define("WEBHOOK_ERROR_REPORT_LEAVE", 0);    //webhook 模式下的错误报告级别
 define("IGNORE_UNREPORTED_ERRORS", true);   //是否忽略未报告的错误
 define("MEMORY_RESERVE_SIZE", 262144);      //内存预留大小
