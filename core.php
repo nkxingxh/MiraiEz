@@ -349,6 +349,25 @@ function memberList($target = true, $sessionKey = '')
     return HttpAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
+/**群管理 与 群公告 */
+
+function groupConfig($target = true, $config = array(), $sessionKey = '')
+{
+    if ($target === true) {
+        $target = getCurrentGroupId();
+        if (!$target) return false;
+    } else $target = (int) $target;
+    if (empty($config)) return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target
+    ));
+    else return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'target' => $target,
+        'config' => $config
+    ), true);
+}
+
 /**
  * 获取/修改群员设置
  * @param int $target 指定群的群号
@@ -380,18 +399,6 @@ function memberInfo($target = true, $memberId = true, $info = array(), $sessionK
         'memberId' => $memberId,
         'info' => $info
     ), true);
-}
-
-/**群管理 */
-
-function groupConfig($target = true, $sessionKey = '')
-{
-    if ($target === true) {
-        global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
-        else return false;
-    } else $target = (int) $target;
-    return autoAdapter(__FUNCTION__, array('sessionKey' => $sessionKey, 'target' => $target));
 }
 
 /**事件处理 */
