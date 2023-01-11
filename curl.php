@@ -26,17 +26,19 @@ function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt =
     #关闭SSL
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    
+    #返回数据不直接显示
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    //curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+
+    //适配 gzip 压缩
+    curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
+
     if (!empty($setopt) && is_array($setopt)) {
         foreach ($setopt as $value) {
             curl_setopt($curl, $value[0], $value[1]);
         }
     }
-    #返回数据不直接显示
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-
-    //适配 gzip 压缩
-    curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
 
     $response = curl_exec($curl);
     curl_close($curl);
@@ -59,11 +61,6 @@ function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array()
         curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-    if (!empty($setopt) && is_array($setopt)) {
-        foreach ($setopt as $value) {
-            curl_setopt($curl, $value[0], $value[1]);
-        }
-    }
     #关闭SSL
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -74,6 +71,12 @@ function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array()
 
     //适配 gzip 压缩
     curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
+
+    if (!empty($setopt) && is_array($setopt)) {
+        foreach ($setopt as $value) {
+            curl_setopt($curl, $value[0], $value[1]);
+        }
+    }
 
     $response = curl_exec($curl);
     curl_close($curl);
@@ -94,11 +97,6 @@ function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(),
         curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-    if (!empty($setopt) && is_array($setopt)) {
-        foreach ($setopt as $value) {
-            curl_setopt($curl, $value[0], $value[1]);
-        }
-    }
     #关闭SSL
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -106,6 +104,11 @@ function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(),
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
     curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+    if (!empty($setopt) && is_array($setopt)) {
+        foreach ($setopt as $value) {
+            curl_setopt($curl, $value[0], $value[1]);
+        }
+    }
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
@@ -123,11 +126,6 @@ function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(
         curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-    if (!empty($setopt) && is_array($setopt)) {
-        foreach ($setopt as $value) {
-            curl_setopt($curl, $value[0], $value[1]);
-        }
-    }
     #关闭SSL
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -135,6 +133,11 @@ function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PATCH");
     curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+    if (!empty($setopt) && is_array($setopt)) {
+        foreach ($setopt as $value) {
+            curl_setopt($curl, $value[0], $value[1]);
+        }
+    }
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
@@ -152,11 +155,6 @@ function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array
         curl_setopt($curl, CURLOPT_REFERER, $referer);
     if ($cookie != '')
         curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-    if (!empty($setopt) && is_array($setopt)) {
-        foreach ($setopt as $value) {
-            curl_setopt($curl, $value[0], $value[1]);
-        }
-    }
     #关闭SSL
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -164,6 +162,11 @@ function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+    if (!empty($setopt) && is_array($setopt)) {
+        foreach ($setopt as $value) {
+            curl_setopt($curl, $value[0], $value[1]);
+        }
+    }
     $response = curl_exec($curl);
     curl_close($curl);
     return $response;
