@@ -8,6 +8,72 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
+ /**
+ * 自动获取 SessionKey 并绑定 QQ
+ */
+function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
+{
+    $file = dataDir . "/session.json";
+    if (!file_exists($file)) file_put_contents($file, "[]");
+    $session = file_get_contents($file);
+    $session = json_decode($session, true);
+    if (json_last_error() != JSON_ERROR_NONE || is_array($session) == false) {
+        file_put_contents($file, "[]");
+        $session = array();
+    }
+
+    $n = count($session);
+    for ($i = 0; $i < $n; $i++) {
+        if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq || empty($qq)) {
+            if (empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
+            if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
+                $resp = HttpAdapter_verify();
+                if (isset($resp['code']) && $resp['code'] == 0) {
+                    $session[$i]['session'] = $resp['session'];
+                }
+                $resp = HttpAdapter_bind($session[$i]['session'], $qq);
+                if (isset($resp['code']) && $resp['code'] == 0) {
+                    file_put_contents($file, json_encode($session), LOCK_EX);
+                    return $session[$i]['session'];
+                }
+            } elseif (time() - $session[$i]['time'] <= 1800) {
+                return $session[$i]['session'];
+            } else {    //定期释放 session 并重新申请 session (现在放到下面那一段去了)
+                /*HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
+                $data = array('qq' => $qq, 'session' => '', 'time' => time());
+                $resp = HttpAdapter_verify();
+                if ($resp['code'] == 0) {
+                    $data['session'] = $resp['session'];
+                }
+                $resp = HttpAdapter_bind($data['session'], $qq);
+                if ($resp['code'] == 0) {
+                    $session[$i] = $data;
+                    file_put_contents($file, json_encode($session), LOCK_EX);
+                    return $data['session'];
+                }*/
+                $n = $i;
+                break;
+            }
+        }
+    }
+
+    $data = array('qq' => $qq, 'session' => '', 'time' => time());
+    $resp = HttpAdapter_verify();
+    if (isset($resp['code']) && $resp['code'] == 0) {
+        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai', 1);
+        $data['session'] = $resp['session'];
+    }
+    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai', 1);
+    $resp = HttpAdapter_bind($data['session'], $qq);
+    if (isset($resp['code']) && $resp['code'] == 0) {
+        $session[$n] = $data;
+        file_put_contents($file, json_encode($session), LOCK_EX);
+        return $data['session'];
+    }
+    writeLog("失败!", __FUNCTION__, 'easyMirai', 1);
+    return "";
+}
+
 /**
  * 判断指定群是否存在指定成员
  * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
@@ -220,72 +286,6 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 }
 
 /**
- * 自动获取 SessionKey 并绑定 QQ
- */
-function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
-{
-    $file = dataDir . "/session.json";
-    if (!file_exists($file)) file_put_contents($file, "[]");
-    $session = file_get_contents($file);
-    $session = json_decode($session, true);
-    if (json_last_error() != JSON_ERROR_NONE || is_array($session) == false) {
-        file_put_contents($file, "[]");
-        $session = array();
-    }
-
-    $n = count($session);
-    for ($i = 0; $i < $n; $i++) {
-        if ((!empty($session[$i]['qq'])) || $session[$i]['qq'] == $qq || empty($qq)) {
-            if (empty($qq)) $qq = $session[$i]['qq'];    //传入 qq 为空时，选择第一个
-            if (empty($session[$i]['session']) || $forceUpdateSessionKey) {
-                $resp = HttpAdapter_verify();
-                if (isset($resp['code']) && $resp['code'] == 0) {
-                    $session[$i]['session'] = $resp['session'];
-                }
-                $resp = HttpAdapter_bind($session[$i]['session'], $qq);
-                if (isset($resp['code']) && $resp['code'] == 0) {
-                    file_put_contents($file, json_encode($session), LOCK_EX);
-                    return $session[$i]['session'];
-                }
-            } elseif (time() - $session[$i]['time'] <= 1800) {
-                return $session[$i]['session'];
-            } else {    //定期释放 session 并重新申请 session (现在放到下面那一段去了)
-                /*HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
-                $data = array('qq' => $qq, 'session' => '', 'time' => time());
-                $resp = HttpAdapter_verify();
-                if ($resp['code'] == 0) {
-                    $data['session'] = $resp['session'];
-                }
-                $resp = HttpAdapter_bind($data['session'], $qq);
-                if ($resp['code'] == 0) {
-                    $session[$i] = $data;
-                    file_put_contents($file, json_encode($session), LOCK_EX);
-                    return $data['session'];
-                }*/
-                $n = $i;
-                break;
-            }
-        }
-    }
-
-    $data = array('qq' => $qq, 'session' => '', 'time' => time());
-    $resp = HttpAdapter_verify();
-    if (isset($resp['code']) && $resp['code'] == 0) {
-        writeLog("记录 session: " . $resp['session'], __FUNCTION__, 'easyMirai', 1);
-        $data['session'] = $resp['session'];
-    }
-    writeLog("绑定 [$qq] ...", __FUNCTION__, 'easyMirai', 1);
-    $resp = HttpAdapter_bind($data['session'], $qq);
-    if (isset($resp['code']) && $resp['code'] == 0) {
-        $session[$n] = $data;
-        file_put_contents($file, json_encode($session), LOCK_EX);
-        return $data['session'];
-    }
-    writeLog("失败!", __FUNCTION__, 'easyMirai', 1);
-    return "";
-}
-
-/**
  * 获取消息链
  * @param string @PlainText             消息文本
  * @param string|array $ImageUrl        图片链接(可以是数组)
@@ -347,9 +347,9 @@ function getMessageChain_Json($json)
     return array('type' => 'Json', 'json' => $json);
 }
 
-function isMessage($type = null)
+function isMessage($type = true)
 {
-    if ($type === null && webhook) {
+    if ($type === true && webhook) {
         global $_DATA;
         $type = $_DATA['type'];
     }
@@ -491,6 +491,7 @@ function getCurrentSenderId()
 {
     if (isset($GLOBALS['_DATA']['sender']['id'])) return $GLOBALS['_DATA']['sender']['id'];
     if (isset($GLOBALS['_DATA']['member']['id'])) return $GLOBALS['_DATA']['member']['id'];
+    if (isset($GLOBALS['_DATA']['fromId'])) return $GLOBALS['_DATA']['fromId'];
     return false;
 }
 
@@ -502,5 +503,6 @@ function getCurrentGroupId()
 {
     if (isset($GLOBALS['_DATA']['sender']['group']['id'])) return $GLOBALS['_DATA']['sender']['group']['id'];
     if (isset($GLOBALS['_DATA']['member']['group']['id'])) return $GLOBALS['_DATA']['member']['group']['id'];
+    if (isset($GLOBALS['_DATA']['groupId'])) return $GLOBALS['_DATA']['groupId'];
     return false;
 }
