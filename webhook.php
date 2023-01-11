@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -24,7 +25,7 @@ if (verifyAuthorization()) {
 
 // Webhook 消息预处理
 $webhooked = false;
-define("bot", $_SERVER['HTTP_BOT']);
+define("bot", (int) $_SERVER['HTTP_BOT']);
 
 if (isMessage($_DATA['type'])) {
     $_PlainText = messageChain2PlainText($_DATA['messageChain']);

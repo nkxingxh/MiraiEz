@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -8,7 +9,7 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
- /**
+/**
  * 自动获取 SessionKey 并绑定 QQ
  */
 function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
@@ -81,17 +82,19 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
  * 
  * @return bool|null         如果该成员在群中返回 true 反之返回 false，失败返回 null
  */
-function isInGroup($groupID = null, $target = null)
+function isInGroup($groupID = true, $target = null)
 {
-    global $_DATA;
+
     if ($groupID === true) {
-        if (!empty($_DATA['sender']['group']['id'])) $groupID = $_DATA['sender']['group']['id'];
-        else return null;
+        $groupID = getCurrentGroupId();
+        if (!$groupID) return false;
     } else $groupID = (int) $groupID;
 
     if ($target === true) {
-        if (!empty($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
-        else return null;
+        $target = getCurrentSenderId();
+        if (!$target) return false;
+    } elseif ($target === null) {
+        if (defined('bot')) $target = bot;
     } else $target = (int) $target;
 
     $resp = memberList($groupID);
@@ -110,16 +113,13 @@ function isInGroup($groupID = null, $target = null)
 /**
  * 获取 BOT 在群中的权限
  * 返回 MEMBER / ADMINISTRATOR / OWNER / false
- * 返回 false 表示未加群
+ * 返回 false 表示未加群, 返回 null 表示获取当前群失败
  */
-function getGroupPermission($groupID = null, $sessionKey = '')
+function getGroupPermission($groupID = true, $sessionKey = '')
 {
-    if ($groupID === null) {
-        global $_DATA;
-        if ($_DATA['type'] == 'GroupMessage')
-            $groupID = $_DATA['sender']['group']['id'];
-        else
-            return null;
+    if ($groupID === true) {
+        $groupID = getCurrentGroupId();
+        if(!$groupID) return null;
     }
     $groupList = groupList($sessionKey);
     if ($groupList['code'] == 0) {
