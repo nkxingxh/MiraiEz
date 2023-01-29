@@ -119,7 +119,7 @@ function getGroupPermission($groupID = true, $sessionKey = '')
 {
     if ($groupID === true) {
         $groupID = getCurrentGroupId();
-        if(!$groupID) return null;
+        if (!$groupID) return null;
     }
     $groupList = groupList($sessionKey);
     if ($groupList['code'] == 0) {
@@ -185,6 +185,8 @@ function messageChain2At($messageChain = null)
     for ($i = 0; $i < $n; $i++) {
         if ($messageChain[$i]['type'] == 'At') {
             $At[] = $messageChain[$i]['target'];
+        } elseif ($messageChain[$i]['type'] == 'AtAll') {
+            $At[] = -1;
         }
     }
     return $At;
