@@ -9,7 +9,7 @@
  */
 
 define("OneBotBridge", true);
-require_once "$baseDir/miraiOneBot.php";
+require_once "$coreDir/miraiOneBot.php";
 
 /**
  * OneBot_auth

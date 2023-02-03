@@ -13,22 +13,23 @@ if (defined('mdm_cli')) { //如果在 mdm_cli 中运行则定义全局变量
 }
 $baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
 define('baseDir', $baseDir);            //定义站点目录
+$coreDir = "$baseDir/core";
 
 if (!defined("webhook")) define("webhook", false);
 
-require_once "$baseDir/pfa.php";
-require_once "$baseDir/errorHandle.php";
+require_once "$coreDir/pfa.php";
+require_once "$coreDir/errorHandle.php";
 require_once "$baseDir/config.php";
-require_once "$baseDir/string.php";
-require_once "$baseDir/curl.php";
-require_once "$baseDir/easyMirai.php";
-require_once "$baseDir/pluginsHelp.php";
-require_once "$baseDir/OneBotBridge.php";
+require_once "$coreDir/string.php";
+require_once "$coreDir/curl.php";
+require_once "$coreDir/easyMirai.php";
+require_once "$coreDir/pluginsHelp.php";
+require_once "$coreDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '2.2.1');
+define("version", '2.3.0');
 
-require_once "core.php";
+require_once "$coreDir/core.php";
 
 if (pfa) $pfa_loadedTime = microtime(true);
