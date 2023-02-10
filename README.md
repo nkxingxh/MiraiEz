@@ -27,10 +27,12 @@
 
 **临时解决方案**
 
-> 在 config.php 中将 MIRAIEZ_ADAPTER_ALWAYS_USE_HTTP 改为 true 使 MiraiEz 只通过 HTTP 适配器发送命令即可。
+> 在 config/debug.php 中将 MIRAIEZ_ADAPTER_ALWAYS_USE_HTTP 改为 true 使 MiraiEz 只通过 HTTP 适配器发送命令即可。
 > 但该方式会导致响应时间变长, 在 Bug 修复后建议还原。
 
 ## 插件开发
+
+**墙裂(雾)建议各位开发者阅读[用户手册](https://miraiez.nkxingxh.top/)**
 
 将你编写的插件放入 plugins 文件夹即可自动加载
 请查看 plugins 文件夹中的示例插件；
