@@ -12,7 +12,7 @@
 if (defined('mdm_cli') || !empty(__FUNCTION__)) { //如果在 mdm_cli 中运行 (或在函数中运行) 则定义全局变量
     global $baseDir, $dataDir;
 }
-$baseDir = empty($_SERVER['DOCUMENT_ROOT']) ? __DIR__ : $_SERVER['DOCUMENT_ROOT'];
+$baseDir = __DIR__;
 define('baseDir', $baseDir);            //定义站点目录
 $coreDir = "$baseDir/core";
 

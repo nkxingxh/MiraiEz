@@ -86,7 +86,7 @@ function HttpAdapter($command, $content = array(), $post = null, $json = true)
 
 function HttpAdapter_verify()
 {
-    $data = json_encode(array('MIRAIEZ_HTTP_KEY' => MIRAIEZ_HTTP_KEY));
+    $data = json_encode(array('verifyKey' => MIRAIEZ_HTTP_KEY));
     $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/verify');
     $resp = json_decode($resp, true);
     if (empty($resp)) {
