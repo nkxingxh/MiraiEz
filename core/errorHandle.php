@@ -32,10 +32,10 @@ set_exception_handler(function ($e) {
 
     //尝试回复消息给调试人员
     if (webhook) {
-        global $debug_friends, $debug_groups, $_DATA;
+        global $MIRAIEZ_DEBUG_FRIENDS, $MIRAIEZ_DEBUG_GROUPS, $_DATA;
         if (
-            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $debug_friends)) ||
-            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $debug_groups))
+            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $MIRAIEZ_DEBUG_FRIENDS)) ||
+            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $MIRAIEZ_DEBUG_GROUPS))
         ) {
             replyMessage($msg);
         }
@@ -55,10 +55,10 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 
     //尝试回复消息给调试人员
     if (webhook) {
-        global $debug_friends, $debug_groups, $_DATA;
+        global $MIRAIEZ_DEBUG_FRIENDS, $MIRAIEZ_DEBUG_GROUPS, $_DATA;
         if (
-            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $debug_friends)) ||
-            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $debug_groups))
+            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $MIRAIEZ_DEBUG_FRIENDS)) ||
+            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $MIRAIEZ_DEBUG_GROUPS))
         ) {
             replyMessage($msg);
         } elseif (defined('mdm_cli')) {
@@ -88,10 +88,10 @@ register_shutdown_function(function () {
 
     //尝试回复消息给调试人员
     if (webhook) {
-        global $debug_friends, $debug_groups, $_DATA;
+        global $MIRAIEZ_DEBUG_FRIENDS, $MIRAIEZ_DEBUG_GROUPS, $_DATA;
         if (
-            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $debug_friends)) ||
-            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $debug_groups))
+            ($_DATA['type'] == 'FriendMessage' && in_array($_DATA['sender']['id'], $MIRAIEZ_DEBUG_FRIENDS)) ||
+            ($_DATA['type'] == 'GroupMessage' && in_array($_DATA['sender']['group']['id'], $MIRAIEZ_DEBUG_GROUPS))
         ) {
             replyMessage($msg);
         } elseif (defined('mdm_cli')) {

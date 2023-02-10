@@ -47,7 +47,7 @@ function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt =
 
 function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    if (logging_level == 1) {
+    if (MIRAIEZ_LOGGING_LEVEL == 1) {
         writeLog('URL: ' . $url, __FUNCTION__, 'curl', 1);
         writeLog('Payload: ' . (is_array($payload) ? ('(Array) ' . json_encode($payload, JSON_UNESCAPED_UNICODE)) : $payload), __FUNCTION__, 'curl', 1);
     }

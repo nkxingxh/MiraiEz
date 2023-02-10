@@ -26,7 +26,7 @@
 
 **临时解决方案**
 
-> 在 config.php 中将 adapter_always_use_http 改为 true 使 MiraiEz 只通过 HTTP 适配器发送命令即可。
+> 在 config.php 中将 MIRAIEZ_ADAPTER_ALWAYS_USE_HTTP 改为 true 使 MiraiEz 只通过 HTTP 适配器发送命令即可。
 > 但该方式会导致响应时间变长, 在 Bug 修复后建议还原。
 
 ## 插件开发

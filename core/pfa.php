@@ -8,10 +8,7 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-//是否启用性能分析
-define("pfa", false);
-
-if (pfa) {
+if (MIRAIEZ_PFA) {
     //开始统计性能
     $pfa_startTime = microtime(true);
     if (webhook) {
@@ -48,6 +45,6 @@ function pfa_end()
         }
 
         //输出性能分析结果
-        writeLog($msg, $_DATA['type'], 'pfa', 2);
+        writeLog($msg, $_DATA['type'], 'MIRAIEZ_PFA', 2);
     }
 }

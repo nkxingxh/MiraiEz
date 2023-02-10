@@ -2,5 +2,5 @@
 data_*/
 tmp/
 logs/
-*.json
 *.drawio
+vendor/

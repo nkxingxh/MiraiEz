@@ -142,7 +142,7 @@ function hookRegister($func, ...$types)
 {
     global $_plugins, $_DATA;
 
-    if (pfa) {
+    if (MIRAIEZ_PFA) {
         global $pfa_func_registered, $pfa_func_hooked;
         $pfa_func_registered++;  //已注册函数数量 +1
     }
@@ -154,7 +154,7 @@ function hookRegister($func, ...$types)
                 $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;   //挂钩对象中的方法 (v2 插件)
             }
 
-            if (pfa) $pfa_func_hooked++;  //挂钩函数数量加 1
+            if (MIRAIEZ_PFA) $pfa_func_hooked++;  //挂钩函数数量加 1
             return true;                //挂钩成功
             break;
         }

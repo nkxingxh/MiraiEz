@@ -10,7 +10,8 @@
  */
 
 define("webhook", true);
-require_once "loader.php";
+define('MIRAIEZ_RUNNING_MODE', 1);
+require_once "../loader.php";
 header('content-type: application/json');
 
 if (verifyAuthorization()) {
@@ -24,7 +25,8 @@ if (verifyAuthorization()) {
 }
 
 $webhooked = false;     //标记是否已使用 webhook 返回
-define("bot", (int) $_SERVER['HTTP_BOT']);
+$_Bot = (int) $_SERVER['HTTP_BOT'];
+define("bot", $_Bot);
 
 // Webhook 消息预处理
 if (isMessage($_DATA['type'])) {
@@ -33,20 +35,20 @@ if (isMessage($_DATA['type'])) {
     $_At = messageChain2At($_DATA['messageChain']);
 }
 
-if (pfa) $pfa_pluginInitTime = microtime(true);
-require_once "plugins.php"; //插件依赖
+if (MIRAIEZ_PFA) $pfa_pluginInitTime = microtime(true);
+require_once "../plugins.php"; //插件依赖
 loadPlugins();  //加载插件
 hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
-if (pfa) $pfa_pluginFuncTime = microtime(true);
+if (MIRAIEZ_PFA) $pfa_pluginFuncTime = microtime(true);
 execPluginsFunction();  //执行插件函数
 
-if (pfa) pfa_end();
+if (MIRAIEZ_PFA) pfa_end();
 
 function checkUpdates($_DATA)
 {
     if ($_DATA['type'] == 'FriendMessage')
-        if ($_DATA['sender']['id'] == admin_qq) {
+        if ($_DATA['sender']['id'] == MIRAIEZ_ADMIN_QQ) {
             global $_PlainText;
             if ($_PlainText != '检查更新') return;
         } else return;
@@ -54,11 +56,11 @@ function checkUpdates($_DATA)
     $resp = CurlGET($url);
     $resp = json_decode($resp, true);
     if (empty($resp)) {
-        if ($_DATA['type'] == 'FriendMessage') sendFriendMessage(admin_qq, "miraiez 获取最新版本失败");
+        if ($_DATA['type'] == 'FriendMessage') sendFriendMessage(MIRAIEZ_ADMIN_QQ, "miraiez 获取最新版本失败");
         return false;
     }
     if (compareVersions(version, $resp['tag_name']) == '<')
-        sendFriendMessage(admin_qq, "miraiez 发现新版本\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
+        sendFriendMessage(MIRAIEZ_ADMIN_QQ, "miraiez 发现新版本\n当前版本：" . version . "\n最新版本：" . $resp['tag_name']);
     elseif ($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
 }
 
@@ -77,7 +79,7 @@ function compareVersions($ver1, $ver2)
 
 function verifyAuthorization()
 {
-    if (empty(Authorization)) return true;
+    if (empty(MIRAIEZ_WEBHOOK_AUTH)) return true;
     if (empty($_SERVER['HTTP_AUTHORIZATION'])) return false;
-    return (('[' . Authorization . ']') == $_SERVER['HTTP_AUTHORIZATION']) || (Authorization == $_SERVER['HTTP_AUTHORIZATION']);
+    return (('[' . MIRAIEZ_WEBHOOK_AUTH . ']') == $_SERVER['HTTP_AUTHORIZATION']) || (MIRAIEZ_WEBHOOK_AUTH == $_SERVER['HTTP_AUTHORIZATION']);
 }

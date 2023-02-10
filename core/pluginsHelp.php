@@ -17,7 +17,7 @@
  */
 function writeLog($content, $module = '', $logfilename = '', $level = 2)
 {
-    if($level < logging_level) return;
+    if($level < MIRAIEZ_LOGGING_LEVEL) return;
     if (empty($logfilename) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             $logfilename = $package;
@@ -68,7 +68,7 @@ function getConfig($configFile = '')
     $configFile = str_replace('.\\', '.', $configFile);
     if (empty($configFile) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
-            if (plugins_data_isolation) {
+            if (MIRAIEZ_PLUGINS_DATA_ISOLATION) {
                 if (empty($configFile)) $configFile = 'config';
                 $configFile = $package . '/' . $configFile;
             } else {
@@ -94,7 +94,7 @@ function saveConfig($configFile = '', $config, $jsonEncodeFlags = JSON_UNESCAPED
     $configFile = str_replace('.\\', '.', $configFile);
     if (empty($configFile) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
-            if (plugins_data_isolation) {
+            if (MIRAIEZ_PLUGINS_DATA_ISOLATION) {
                 if (empty($configFile)) $configFile = 'config';
                 $configFile = $package . '/' . $configFile;
             } else {

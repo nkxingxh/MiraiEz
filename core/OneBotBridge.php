@@ -688,7 +688,7 @@ function OneBot_API_11($command, $d = array())
 
     $d = json_encode($d);
     $header = array('Content-Type: application/json');
-    if (!empty(OneBot11_access_token)) $header[] = "Authorization: Bearer " . OneBot11_access_token;
+    if (!empty(OneBot11_access_token)) $header[] = "MIRAIEZ_WEBHOOK_AUTH: Bearer " . OneBot11_access_token;
 
     $url = OneBot11_HTTP_API . '/' . $command;
     writeLog($d, $url, 'OneBot', 1);

@@ -159,8 +159,8 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
          * 错误处理
          * 本框架会尝试捕获运行中发生的异常、错误, 并记录到 errorHandle.log 文件中
          * 
-         * 如果当前处理的消息为好友消息且发送者在 $debug_friends 中, 则会将错误信息直接发送给当前消息的发送者;
-         * 如果当前处理的消息为群消息且该群号在 $debug_groups 中, 则会将错误信息直接发送到当前消息的所在群
+         * 如果当前处理的消息为好友消息且发送者在 $MIRAIEZ_DEBUG_FRIENDS 中, 则会将错误信息直接发送给当前消息的发送者;
+         * 如果当前处理的消息为群消息且该群号在 $MIRAIEZ_DEBUG_GROUPS 中, 则会将错误信息直接发送到当前消息的所在群
          * (通过 config.exe 来设置上述的两个变量)
          * 
          * 向机器人发送 /error, 你将可以直观地看到本框架的错误处理反馈
