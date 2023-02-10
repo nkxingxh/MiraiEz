@@ -88,7 +88,13 @@ function getConfig($configFile = '')
     return $config;
 }
 
-function saveConfig($configFile = '', $config, $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
+/**
+ * 保存配置
+ * @param string configFile 配置文件名 (留空则为当前插件包名)
+ * @param array config 配置内容 (可进行 JSON 编码的内容)
+ * @param int jsonEncodeFlags JSON 编码选项
+ */
+function saveConfig($configFile = '', $config = array(), $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
