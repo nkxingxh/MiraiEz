@@ -10,11 +10,12 @@
 
 ## 开始使用
 
-建议从 Releases 中下载最新的稳定版本。
-请在 mirai-api-http 的配置文件中启用 http 和 webhook 适配器，
-并将 webhook 适配器的回调地址设置为 webhook.php 的所在地址。
-例如 http://localhost/webhook.php
-完成上述步骤后，请修改 config.php 中的相关设置。
+- 建议从 Releases 中下载最新的稳定版本。
+- 请在 mirai-api-http 的配置文件中启用 http 和 webhook 适配器
+- 并将 webhook 适配器的回调地址设置为 webhook.php 的所在地址。
+- 例如 http://localhost/webhook.php
+- 完成上述步骤后，请修改 config.php 中的相关设置。
+- **(重要) 在 Web 服务器的站点配置中，将运行目录修改为 /public**
 
 #### 注意
 
