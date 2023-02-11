@@ -4,3 +4,5 @@ tmp/
 logs/
 *.drawio
 vendor/
+update_tmp/
+update.zip

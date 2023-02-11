@@ -15,7 +15,7 @@ class pluginParent
     const _pluginAuthor = "NKXingXh";
     const _pluginDescription = "MiraiEz 插件核心";
     const _pluginPackage = "top.nkxingxh.miraiez";
-    const _pluginVersion = version;
+    const _pluginVersion = MIRAIEZ_VERSION;
 
     //构造函数
     public function __construct()

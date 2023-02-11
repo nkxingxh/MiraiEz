@@ -31,14 +31,14 @@ require_once "$coreDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define("version", '2.3.0');
+define('MIRAIEZ_VERSION', '2.3.0');
 
 require_once "$coreDir/adapter.php";
 require_once "$coreDir/core.php";
 
 if (MIRAIEZ_PFA) $pfa_loadedTime = microtime(true);
 
-$TypedArt = "\n███╗   ███╗██╗██████╗  █████╗ ██╗███████╗███████╗\n████╗ ████║██║██╔══██╗██╔══██╗██║██╔════╝╚══███╔╝\n██╔████╔██║██║██████╔╝███████║██║█████╗    ███╔╝ \n██║╚██╔╝██║██║██╔══██╗██╔══██║██║██╔══╝   ███╔╝  \n██║ ╚═╝ ██║██║██║  ██║██║  ██║██║███████╗███████╗\n╚═╝     ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝\n\nMiraiEz " . version . " - Copyright (c) 2021-2023 NKXingXh\n\n";
+$TypedArt = "\n███╗   ███╗██╗██████╗  █████╗ ██╗███████╗███████╗\n████╗ ████║██║██╔══██╗██╔══██╗██║██╔════╝╚══███╔╝\n██╔████╔██║██║██████╔╝███████║██║█████╗    ███╔╝ \n██║╚██╔╝██║██║██╔══██╗██╔══██║██║██╔══╝   ███╔╝  \n██║ ╚═╝ ██║██║██║  ██║██║  ██║██║███████╗███████╗\n╚═╝     ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝\n\nMiraiEz " . MIRAIEZ_VERSION . " - Copyright (c) 2021-2023 NKXingXh\n\n";
 if (defined('MIRAIEZ_RUNNING_MODE') &&  MIRAIEZ_RUNNING_MODE == 2) {
     echo $TypedArt;
 }
