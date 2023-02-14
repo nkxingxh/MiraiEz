@@ -124,27 +124,33 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
     mkdir("$tmp_dir/backup");
     foreach ($backups as $v) {
         if (!file_exists($v)) continue;
-        echo "[mv] ./$v $tmp_dir/backup/$v\n";continue;
+        echo "[mv] ./$v $tmp_dir/backup/$v\n";
+        continue;
         if (!rename("./$v", "$tmp_dir/backup/$v")) {
             echo "移动文件(或目录) $v 失败!\n";
             exit(-1);
         }
     }
     //删除老文件
+    echo "正在移除老文件...\n";
     $dir_arr = glob('./*');
     foreach ($dir_arr as $v) {
-        if ($v == $tmp_dir) continue;
+        if ($v == $tmp_dir || strtolower(substr($v, 0, 7)) == './data_') continue;
         //unlink($v);
         echo "[rm] $v\n";
     }
     //移动更新内容
+    echo "正在移动更新内容...\n";
     $update_arr = glob("$update_dir/*");
     $update_dir_len = strlen($update_dir);
-    foreach($update_arr as $v) {
-        $fn = substr($v, -(strlen($v) - $update_dir_len - 1));
+    foreach ($update_arr as $v) {
+        $fn = substr($v, - (strlen($v) - $update_dir_len - 1));
         //rename($v, "./$fn");
         echo "[mv] $v ./$fn\n";
     }
+
+    unlink('./update.zip');
+    unlink($tmp_dir);
 }
 
 /**
