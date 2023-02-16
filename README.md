@@ -10,18 +10,18 @@
 
 ## 开始使用
 
+### 建议阅读 [快速部署指南](https://miraiez.nkxingxh.top/guide/)
+
 - 建议从 Releases 中下载最新的稳定版本。
 - 请在 mirai-api-http 的配置文件中启用 http 和 webhook 适配器
-- 并将 webhook 适配器的回调地址设置为 webhook.php 的所在地址。
+- 并将 webhook 适配器的回调地址设置为 /webhook.php 的所在地址。
 - 例如 http://localhost/webhook.php
-- 完成上述步骤后，请修改 config.php 中的相关设置。
+- 完成上述步骤后，请修改 config 目录中的相关配置文件。
 - **(重要) 在 Web 服务器的站点配置中，将运行目录修改为 /public**
 
 #### 注意
 
 1. 请勿在 mirai-api-http 中开启单会话模式！
-
-1. loader.php 中第 5 行的 `$baseDir` 可根据需要进行修改，默认情况下 `$baseDir` 值为站点根目录。如果 MiraiEz 并不是在站点根目录下运行的，你可将其修改为 `$baseDir = __DIR__;`
 
 1. 测试发现 mirai-api-http v2.6.2 的 webhook 适配器存在一些问题, 导致不执行 MiraiEz 通过其返回的命令。
 
