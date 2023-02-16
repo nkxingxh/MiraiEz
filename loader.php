@@ -18,7 +18,7 @@ $coreDir = "$baseDir/core";
 
 if (!defined("webhook")) define("webhook", false);
 
-require_once "$baseDir/config/normal.php";
+require_once "$baseDir/config/adapter.php";
 require_once "$baseDir/config/debug.php";
 
 require_once "$coreDir/pfa.php";

@@ -8,6 +8,9 @@
  * 
  * Github: https://github.com/nkxingxh/MiraiEz
  */
+
+define('MIRAIEZ_ADMIN_QQ', 1234567890);                     //填写用于管理机器人，接收机器人通知的 qq
+
 $MIRAIEZ_DEBUG_GROUPS = [123456789];                        //启用调试的群组
 $MIRAIEZ_DEBUG_FRIENDS = [1234567890];                      //启用调试的好友
 
