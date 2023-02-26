@@ -31,7 +31,7 @@ require_once "$coreDir/OneBotBridge.php";
 
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
-define('MIRAIEZ_VERSION', '2.3.0');
+define('MIRAIEZ_VERSION', '2.3.1');
 
 require_once "$coreDir/adapter.php";
 require_once "$coreDir/core.php";
