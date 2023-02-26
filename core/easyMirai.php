@@ -290,10 +290,10 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 /**
  * 获取消息链
  * @param string @PlainText             消息文本
- * @param string|array $ImageUrl        图片链接(可以是数组)
+ * @param string|array $Images          图片链接或 base64 (可以是数组)
  * @param int|array  $AtTarget          要 At 的 QQ 号(可以是数组)
  */
-function getMessageChain($PlainText = '', $ImageUrl = '', $AtTarget = 0)
+function getMessageChain($PlainText = '', $Images = '', $AtTarget = 0)
 {
     $MessageChain = array();
     if (!empty($AtTarget)) {
@@ -315,14 +315,21 @@ function getMessageChain($PlainText = '', $ImageUrl = '', $AtTarget = 0)
         } else $MessageChain[] = getMessageChain_PlainText($PlainText);
     }
 
-    if (!empty($ImageUrl)) {
-        if (is_array($ImageUrl)) {
-            $n = count($ImageUrl);
-            for ($i = 0; $i < $n; $i++) {
-                $MessageChain[] = getMessageChain_Image($ImageUrl[$i]);
+
+    if (!empty($Images)) {
+        if (!is_array($Images)) {
+            $Images = array($Images);
+        }
+        $n = count($Images);
+        for ($i = 0; $i < $n; $i++) {
+            if (
+                strtolower(substr($Images[$i], 0, 7)) == 'http://' ||
+                strtolower(substr($Images[$i], 0, 8)) == 'https://'
+            ) {
+                $MessageChain[] = getMessageChain_Image($Images[$i]);
+            } else {
+                $MessageChain[] = getMessageChain_Image(null, $Images[$i]);
             }
-        } else {
-            $MessageChain[] = getMessageChain_Image($ImageUrl);
         }
     }
 
@@ -339,9 +346,14 @@ function getMessageChain_At($target)
     return array('type' => 'At', 'target' => $target);
 }
 
-function getMessageChain_Image($ImageUrl)
+/**
+ * 生产消息链中的图片类型成员 (参数二选一)
+ * @param string ImageUrl 图片链接
+ * @param string ImageBase64 图片 BASE64 编码后的内容
+ */
+function getMessageChain_Image($ImageUrl = null, $ImageBase64 = null)
 {
-    return array('type' => 'Image', 'url' => $ImageUrl);
+    return array('type' => 'Image', 'url' => $ImageUrl, 'base64' => $ImageBase64);
 }
 
 function getMessageChain_Json($json)
