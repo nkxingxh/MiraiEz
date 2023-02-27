@@ -117,6 +117,6 @@ MiraiEz 根据 **AGPL-3.0 许可证** 进行许可，有关详细信息，请参
 
 ## 鸣谢
 
-![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png)
+[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="200"/>](https://www.jetbrains.com/?from=MiraiEz)
 
-感谢 [JetBrains](https://www.jetbrains.com/) 为本项目提供其产品的许可证。
+感谢 [JetBrains](https://www.jetbrains.com/?from=MiraiEz) 为本项目提供其产品的许可证。
