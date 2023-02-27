@@ -31,7 +31,7 @@ function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
  */
 function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
 {
-    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     $content = array(
         'sessionKey' => $sessionKey,
         'target' => (int) $target,
@@ -46,7 +46,7 @@ function sendGroupMessage($target, $messageChain, $quote = 0, $sessionKey = '')
  */
 function sendTempMessage($qq, $group, $messageChain, $quote = 0, $sessionKey = '')
 {
-    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain, '');
+    $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     $content = array(
         'sessionKey' => $sessionKey,
         'qq' => (int) $qq,
@@ -70,7 +70,7 @@ function recall($messageId = true, $target = true, $sessionKey = '')
         else return false;
     } else $messageId = (int) $messageId;
     if ($target === true) {
-        if ($_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
+        if (isset($_DATA['type']) && $_DATA['type'] == 'GroupMessage') $target = $_DATA['sender']['group']['id'];
         elseif (isset($_DATA['sender']['id'])) $target = $_DATA['sender']['id'];
         else return false;
     } else $target = (int) $target;

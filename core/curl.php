@@ -15,8 +15,7 @@ function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt =
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-    if ($UserAgent != "")
-        curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
+    curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent);
     if (!empty($header))
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     if ($referer != '')

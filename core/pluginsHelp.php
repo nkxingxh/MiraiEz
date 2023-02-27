@@ -10,19 +10,19 @@
 
 /**
  * 写出日志
- * @param string    $content       日志内容
- * @param string    $module        模块
- * @param string    $logfilename   日志文件名，不需要 .log
- * @param int       $level          日志级别 (1 DEBUG, 2 INFO, 3 WARN, 4 ERROR, 5 FATAL)
+ * @param string $content       日志内容
+ * @param string $module        模块
+ * @param string $log_file_name   日志文件名，不需要 .log
+ * @param int $level          日志级别 (1 DEBUG, 2 INFO, 3 WARN, 4 ERROR, 5 FATAL)
  */
-function writeLog($content, $module = '', $logfilename = '', $level = 2)
+function writeLog(string $content, string $module = '', string $log_file_name = '', int $level = 2)
 {
     if($level < MIRAIEZ_LOGGING_LEVEL) return;
-    if (empty($logfilename) && defined('webhook') && webhook) {
+    if (empty($log_file_name) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
-            $logfilename = $package;
-        } else $logfilename = 'pluginParent';
-    } elseif (empty($logfilename)) $logfilename = 'MiraiEz';
+            $log_file_name = $package;
+        } else $log_file_name = 'pluginParent';
+    } elseif (empty($log_file_name)) $log_file_name = 'MiraiEz';
 
     switch ($level) {
         case 1:
@@ -44,12 +44,12 @@ function writeLog($content, $module = '', $logfilename = '', $level = 2)
             $level = 'UNKNOWN';
     }
 
-    $fileName = baseDir . "/logs/$logfilename.log";
+    $fileName = baseDir . "/logs/$log_file_name.log";
     makeDir(dirname($fileName));
     file_put_contents($fileName, '[' . date("Y-m-d H:i:s", time()) . " $level]" . (empty($module) ? '' : "[$module]") . " $content\n", LOCK_EX | FILE_APPEND);
 }
 
-function getDataDir()
+function getDataDir(): string
 {
     $dir = scandir(baseDir);
     foreach ($dir as $value) {
@@ -69,10 +69,9 @@ function getConfig($configFile = '')
     if (empty($configFile) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             if (MIRAIEZ_PLUGINS_DATA_ISOLATION) {
-                if (empty($configFile)) $configFile = 'config';
-                $configFile = $package . '/' . $configFile;
+                $configFile = $package . '/config';
             } else {
-                if (empty($configFile)) $configFile = $package;
+                $configFile = $package;
             }
         } else return false;
     } elseif (empty($configFile)) return false;
@@ -90,21 +89,20 @@ function getConfig($configFile = '')
 
 /**
  * 保存配置
- * @param string configFile 配置文件名 (留空则为当前插件包名)
- * @param array config 配置内容 (可进行 JSON 编码的内容)
- * @param int jsonEncodeFlags JSON 编码选项
+ * @param string $configFile configFile 配置文件名 (留空则为当前插件包名)
+ * @param array $config config 配置内容 (可进行 JSON 编码的内容)
+ * @param int $jsonEncodeFlags jsonEncodeFlags JSON 编码选项
  */
-function saveConfig($configFile = '', $config = array(), $jsonEncodeFlags = JSON_UNESCAPED_UNICODE)
+function saveConfig(string $configFile = '', array $config = array(), int $jsonEncodeFlags = JSON_UNESCAPED_UNICODE): bool
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
     if (empty($configFile) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             if (MIRAIEZ_PLUGINS_DATA_ISOLATION) {
-                if (empty($configFile)) $configFile = 'config';
-                $configFile = $package . '/' . $configFile;
+                $configFile = $package . '/config';
             } else {
-                if (empty($configFile)) $configFile = $package;
+                $configFile = $package;
             }
         } else return false;
     } elseif (empty($configFile)) return false;
@@ -122,7 +120,7 @@ function saveConfig($configFile = '', $config = array(), $jsonEncodeFlags = JSON
  * @param string $text 文件内容
  * @return boolean
  */
-function saveFile($fileName, $text)
+function saveFile(string $fileName, string $text): bool
 {
     if (!$fileName || !$text)
         return false;
@@ -146,7 +144,7 @@ function saveFile($fileName, $text)
  * @param int $mode 权限数字
  * @return boolean
  */
-function makeDir($dir, $mode = 0755)
+function makeDir(string $dir, int $mode = 0755): bool
 {
     /*function makeDir($dir, $mode="0777") { 此外0777不能加单引号和双引号，
 	 加了以后，"0400" = 600权限，处以为会这样，我也想不通*/

@@ -40,7 +40,8 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
             } elseif (time() - $session[$i]['time'] <= 1800) {
                 return $session[$i]['session'];
             } else {    //定期释放 session 并重新申请 session (现在放到下面那一段去了)
-                /*HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
+                /*
+                HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
                 $data = array('qq' => $qq, 'session' => '', 'time' => time());
                 $resp = HttpAdapter_verify();
                 if ($resp['code'] == 0) {
@@ -58,6 +59,7 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
         }
     }
 
+    HttpAdapter_release($session[$i]['session'], $session[$i]['qq']);
     $data = array('qq' => $qq, 'session' => '', 'time' => time());
     $resp = HttpAdapter_verify();
     if (isset($resp['code']) && $resp['code'] == 0) {

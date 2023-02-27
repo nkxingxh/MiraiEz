@@ -23,14 +23,14 @@ class pluginParent
     }
 
     //初始化插件
-    public function _init()
+    public function _init(): bool
     {
         hookRegister('miraiezHook', 'FriendMessage');
         return true;
     }
 }
 
-function miraiezHook($_DATA)
+function miraiezHook(): void
 {
     global $_PlainText;
     if ($_PlainText == '/miraiez') {
@@ -42,7 +42,7 @@ function miraiezHook($_DATA)
  * 加载插件
  * @param string $dir 插件目录
  */
-function loadPlugins($dir = 'plugins')
+function loadPlugins(string $dir = 'plugins')
 {
     global $baseDir;
     $pluginsDir = "$baseDir/$dir";
@@ -87,9 +87,9 @@ function loadPlugins($dir = 'plugins')
 
 /**
  * 注册插件
- * @param Class $pluginClass 插件类
+ * @param pluginParent $pluginClass 插件类
  */
-function pluginRegister($pluginClass)
+function pluginRegister(pluginParent $pluginClass): bool
 {
     global $_plugins, $__pluginPackage__;
 
@@ -137,8 +137,11 @@ function pluginRegister($pluginClass)
 
 /**
  * 挂钩函数
+ * @param string $func
+ * @param mixed ...$types
+ * @return bool
  */
-function hookRegister($func, ...$types)
+function hookRegister(string $func, ...$types): bool
 {
     global $_plugins, $_DATA;
 
@@ -165,11 +168,11 @@ function hookRegister($func, ...$types)
 
 /**
  * 检查插件是否启用
- * @param string $pluginClassName 插件类名
  * @param string $pluginPackage 插件包名
  * @param string $pluginFile 插件文件名
+ * @return bool
  */
-function pluginIsEnable($pluginPackage = "", $pluginFile = "")
+function pluginIsEnable(string $pluginPackage = "", string $pluginFile = ""): bool
 {
     if (substr($pluginFile, -4) !== ".php") return false;
     return true;
@@ -178,7 +181,7 @@ function pluginIsEnable($pluginPackage = "", $pluginFile = "")
 /**
  * 执行插件函数
  */
-function execPluginsFunction()
+function execPluginsFunction(): int
 {
     global $_plugins, $_DATA;                          //插件列表，数据
     global $_plugins_count_exec;                       //执行插件计数器

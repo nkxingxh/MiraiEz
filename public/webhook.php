@@ -9,8 +9,8 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-define("webhook", true);
-define('MIRAIEZ_RUNNING_MODE', 1);
+const webhook = true;
+const MIRAIEZ_RUNNING_MODE = 1;
 require_once "../loader.php";
 header('content-type: application/json');
 
@@ -45,13 +45,13 @@ execPluginsFunction();  //执行插件函数
 
 if (MIRAIEZ_PFA) pfa_end();
 
-function checkUpdates($_DATA)
+function checkUpdates($_DATA): bool
 {
     if ($_DATA['type'] == 'FriendMessage')
         if ($_DATA['sender']['id'] == MIRAIEZ_ADMIN_QQ) {
             global $_PlainText;
-            if ($_PlainText != '检查更新') return;
-        } else return;
+            if ($_PlainText != '检查更新') return false;
+        } else return false;
     $url = "https://api.github.com/repos/nkxingxh/miraiez/releases/latest";
     $resp = CurlGET($url);
     $resp = json_decode($resp, true);
@@ -62,9 +62,10 @@ function checkUpdates($_DATA)
     if (compareVersions(MIRAIEZ_VERSION, $resp['tag_name']) == '<')
         sendFriendMessage(MIRAIEZ_ADMIN_QQ, "miraiez 发现新版本\n当前版本：" . MIRAIEZ_VERSION . "\n最新版本：" . $resp['tag_name']);
     elseif ($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
+    return true;
 }
 
-function compareVersions($ver1, $ver2)
+function compareVersions($ver1, $ver2): string
 {
     $verNums1 = (strpos($ver1, '.') === false) ? array($ver1) : explode('.', $ver1);
     $verNums2 = (strpos($ver2, '.') === false) ? array($ver2) : explode('.', $ver2);
@@ -77,7 +78,7 @@ function compareVersions($ver1, $ver2)
     }
 }
 
-function verifyAuthorization()
+function verifyAuthorization(): bool
 {
     if (empty(MIRAIEZ_WEBHOOK_AUTH)) return true;
     if (empty($_SERVER['HTTP_AUTHORIZATION'])) return false;

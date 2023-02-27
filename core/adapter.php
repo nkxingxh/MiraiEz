@@ -40,10 +40,10 @@ function autoAdapter($command = '', $content = array())
  * HTTP 适配器
  * @param string $command 命令字
  * @param array $content 参数内容
- * @param bool $post 是否使用 POST 方法
+ * @param bool|null $post 是否使用 POST 方法
  * @param bool $json 是否使用 JSON 编码 (仅限 POST)
  */
-function HttpAdapter($command, $content = array(), $post = null, $json = true)
+function HttpAdapter(string $command, array $content = array(), bool $post = null, bool $json = true)
 {
     //OneBot Bridge
     if (defined("OneBot")) {
@@ -56,7 +56,7 @@ function HttpAdapter($command, $content = array(), $post = null, $json = true)
     //自动获取 sessionKey
     if (defined('bot') && empty($content['sessionKey'])) {
         $content['sessionKey'] = getSessionKey(bot);
-    } elseif (defined('webhook') && webhook == false) {
+    } elseif (defined('webhook') && !webhook) {
         $content['sessionKey'] = getSessionKey();
     }
 

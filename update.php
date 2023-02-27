@@ -155,8 +155,8 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
 
 /**
  * 获取用户输入
- * @param string int 用户输入字符串
- * @param bool default 默认值
+ * @param string $input 用户输入字符串
+ * @param bool $default 默认值
  * @return bool yes or no
  */
 function get_input_YesOrNo($input = null, $default = false)

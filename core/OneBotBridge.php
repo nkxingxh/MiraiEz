@@ -8,7 +8,7 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-define("OneBotBridge", true);
+const OneBotBridge = true;
 require_once "$coreDir/miraiOneBot.php";
 
 /**
@@ -17,7 +17,7 @@ require_once "$coreDir/miraiOneBot.php";
  * 如果是，则将消息标准化为 mirai-api-http 格式且返回 true
  * 验证失败则返回 false
  */
-function OneBot_auth()
+function OneBot_auth(): bool
 {
     if(!OneBotBridge) return false;
     //writeLog("验证开始", "Auth", "OneBot");
@@ -33,14 +33,14 @@ function OneBot_auth()
     //OneBot 11
     elseif (
         isset($_SERVER['HTTP_X_SIGNATURE']) && $_SERVER['HTTP_X_SIGNATURE'] ===
-        ("sha1=" . hash_hmac("sha1", file_get_contents("php://input"), $config['OneBot11_secret'], false))
+        ("sha1=" . hash_hmac("sha1", file_get_contents("php://input"), $config['OneBot11_secret']))
     ) {
         //writeLog("OneBot 11 验证通过", 'Auth', "OneBot");
 
         $auth = true;
 
         $self_qq = $_SERVER['HTTP_X_SELF_ID'];
-        if (!isset($config['enable'][$self_qq]) || is_array($config['enable'][$self_qq]) == false) {
+        if (!isset($config['enable'][$self_qq]) || !is_array($config['enable'][$self_qq])) {
             return false;       //未配置处理类型，不予处理
         }
 
@@ -85,7 +85,7 @@ function OneBot_get_config()
         $config['OneBot12_access_token'] = "";
     }
 
-    if (!isset($config['enable']) || is_array($config['enable']) == false) {
+    if (!isset($config['enable']) || !is_array($config['enable'])) {
         $needSaveConfig = true;
         $config['enable'] = array(
             "1234567890" => array(
@@ -116,15 +116,13 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
     $type = OneBot_11mirai_getType(
         $d['post_type'],
         $d[$d['post_type'] . '_type'],
-        isset($d['sub_type']) ?
-            $d['sub_type'] :
-            null
+        $d['sub_type'] ?? null
     );
 
     writeLog(json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
 
     //不在处理范围内，不予处理
-    if (is_array($allowType) && empty($type) != true) {
+    if (is_array($allowType) && !empty($type)) {
         if (!in_array($type, $allowType)) return false;
     } elseif ($allowType !== true) return false;
 
@@ -236,7 +234,7 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
     return $new;
 }
 
-function OneBot_permission2mirai($permission)
+function OneBot_permission2mirai($permission): string
 {
     if (strcasecmp($permission, 'member') == 0) return "MEMBER";
     if (strcasecmp($permission, 'admin') == 0) return "ADMINISTRATOR";
@@ -331,7 +329,7 @@ function OneBot_11mirai_getType($post_type, $X_type, $sub_type)
 /**
  * 从OneBot中的消息（String）(CQ码)中获取关键节点并以Miria_11规定的数组的方式返回
  */
-function OneBot_message2chain($message, $msgID, $time)
+function OneBot_message2chain($message, $msgID, $time): array
 {
     $ps = array();
     $i = 0;
@@ -395,7 +393,7 @@ function OneBot_CQCode2messageChain($CQCode)
         $tmp = explode('=', $CQCode[$i]);
         $d[$tmp[0]] = $tmp[1];
     }
-    strtolower($type);      //转成小写进行判断，防止传入数据不标准
+    $type = strtolower($type);      //转成小写进行判断，防止传入数据不标准
     switch ($type) {
         case 'at':
             if ($d['qq'] === 'all') $mc = array(
@@ -648,9 +646,14 @@ function OneBot_API_bridge($command, $content = array())
     writeLog($command . ' => ' . json_encode($content, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
     if (defined("OneBot")) {
         writeLog("转交给 OneBot_API_bridge_11 处理", '', "OneBot");
-        if (OneBot === 11) return OneBot_API_bridge_11($command, $content);
-    } else
+        if (OneBot === 11) {
+            return OneBot_API_bridge_11($command, $content);
+        } else {
+            return false;
+        }
+    } else {
         return false;
+    }
 }
 
 function OneBot_API_bridge_11($command, $content = array())
