@@ -114,3 +114,9 @@ MiraiEz 根据 **AGPL-3.0 许可证** 进行许可，有关详细信息，请参
 你必须保留每个文件顶部的版权标识。
 
 如果你修改后进行重新分发，请在自述文件或修改的文件顶部说明你修改的部分。
+
+## 鸣谢
+
+[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="200"/>](https://www.jetbrains.com/?from=MiraiEz)
+
+感谢 [JetBrains](https://www.jetbrains.com/?from=MiraiEz) 为本项目提供其产品的许可证。
