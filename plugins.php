@@ -4,7 +4,7 @@
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
  * This is free software: you are free to change and redistribute it.
  * There is NO WARRANTY, to the extent permitted by law.
- * 
+ *
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
@@ -157,7 +157,7 @@ function hookRegister(string $func, ...$types): bool
                 $_plugins[$GLOBALS['__pluginPackage__']]['hooked'][] = $func;   //挂钩对象中的方法 (v2 插件)
             }
 
-            if (MIRAIEZ_PFA) $pfa_func_hooked++;  //挂钩函数数量加 1
+            if (isset($pfa_func_hooked)) $pfa_func_hooked++;  //挂钩函数数量加 1
             return true;                //挂钩成功
             break;
         }
@@ -212,7 +212,7 @@ function execPluginsFunction(): int
 
 /**
  * 获取当前插件身份
- * 
+ *
  * @return string|bool 成功则返回插件包名，失败则返回 false
  */
 function plugin_whoami()
