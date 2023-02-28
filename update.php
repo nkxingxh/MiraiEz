@@ -5,7 +5,7 @@
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
  * This is free software: you are free to change and redistribute it.
  * There is NO WARRANTY, to the extent permitted by law.
- * 
+ *
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
@@ -17,7 +17,7 @@ require_once './loader.php';
 
 //选择更新版本
 echo "请选择更新分支及版本:\n  1. 发行版\n  2. 主分支\n  3. 开发分支\n  0. 取消更新\nMiraiEz > ";
-$answer = (int) trim(fgets(STDIN));
+$answer = (int)trim(fgets(STDIN));
 
 switch ($answer) {
     case 1:
@@ -26,6 +26,7 @@ switch ($answer) {
         if (empty($answer)) $answer = null;
         update_releases($answer);
         break;
+//  todo.主分支与开发分支更新
     case 2:
         break;
     case 3:
@@ -60,7 +61,7 @@ function update_releases($ver = null)
                 echo '本地版本高于最新版本, 要强制更新吗? [y/N] ';
                 break;
         }
-        if (!get_input_YesOrNo(null, false)) exit("操作已取消.\n");
+        if (!get_input_YesOrNo()) exit("操作已取消.\n");
 
         $ver = $resp['tag_name'];
     }
@@ -125,7 +126,7 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
     foreach ($backups as $v) {
         if (!file_exists($v)) continue;
         echo "[mv] ./$v $tmp_dir/backup/$v\n";
-        continue;
+        continue;   //todo.完成后移除 continue
         if (!rename("./$v", "$tmp_dir/backup/$v")) {
             echo "移动文件(或目录) $v 失败!\n";
             exit(-1);
@@ -144,7 +145,7 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
     $update_arr = glob("$update_dir/*");
     $update_dir_len = strlen($update_dir);
     foreach ($update_arr as $v) {
-        $fn = substr($v, - (strlen($v) - $update_dir_len - 1));
+        $fn = substr($v, -(strlen($v) - $update_dir_len - 1));
         //rename($v, "./$fn");
         echo "[mv] $v ./$fn\n";
     }
@@ -155,11 +156,11 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
 
 /**
  * 获取用户输入
- * @param string $input 用户输入字符串
+ * @param string|null $input 用户输入字符串
  * @param bool $default 默认值
  * @return bool yes or no
  */
-function get_input_YesOrNo($input = null, $default = false)
+function get_input_YesOrNo(string $input = null, bool $default = false): bool
 {
     if ($input === null) {
         $input = fgets(STDIN);
