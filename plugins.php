@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -23,7 +24,7 @@ class pluginParent
     }
 
     //初始化插件
-    public function _init(): bool
+    public function _init()
     {
         hookRegister('miraiezHook', 'FriendMessage');
         return true;
@@ -87,9 +88,9 @@ function loadPlugins(string $dir = 'plugins')
 
 /**
  * 注册插件
- * @param pluginParent $pluginClass 插件类
+ * @param Object $pluginClass 插件类
  */
-function pluginRegister(pluginParent $pluginClass): bool
+function pluginRegister(Object $pluginClass): bool
 {
     global $_plugins, $__pluginPackage__;
 
