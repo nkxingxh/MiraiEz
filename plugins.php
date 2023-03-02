@@ -214,29 +214,3 @@ function execPluginsFunction(): int
     //返回计数器
     return $_plugins_count_exec;
 }
-
-/**
- * 获取当前插件身份
- *
- * @return string|bool 成功则返回插件包名，失败则返回 false
- */
-function plugin_whoami()
-{
-    return empty($GLOBALS['__pluginPackage__']) ? false : $GLOBALS['__pluginPackage__'];
-}
-
-/**
- * 取得插件支持类对象
- * 
- * @param string $package 插件包名
- */
-function plugin_loadFrontLib(string $package, ...$init_args)
-{
-    global $_plugins;
-    if (!array_key_exists($package, $_plugins)) return null;
-    if (
-        is_object($_plugins[$package]['object']) &&
-        $_plugins[$package]['object']::_pluginFrontLib
-    ) return new $_plugins[$package]['object'](...$init_args);
-    else return false;
-}
