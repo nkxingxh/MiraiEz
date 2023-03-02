@@ -233,6 +233,10 @@ function plugin_whoami()
 function plugin_loadFrontLib(string $package, ...$init_args)
 {
     global $_plugins;
-    return empty($_plugins[$package]['object']::_pluginFrontLib) ? false
-        : (new $_plugins[$package]['object'](...$init_args));
+    if (!array_key_exists($package, $_plugins)) return null;
+    if (
+        is_object($_plugins[$package]['object']) &&
+        $_plugins[$package]['object']::_pluginFrontLib
+    ) return new $_plugins[$package]['object'](...$init_args);
+    else return false;
 }
