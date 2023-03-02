@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -8,14 +9,28 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
- /**
+/**
  * 获取当前插件身份
  *
+ * @param bool $backtrace 是否使用 debug_backtrace 获取堆栈以取得准确的插件信息
  * @return string|bool 成功则返回插件包名，失败则返回 false
  */
-function plugin_whoami()
+function plugin_whoami(bool $backtrace = MIRAIEZ_PLUGINS_WHOAMI_BACKTRACE)
 {
-    return empty($GLOBALS['__pluginPackage__']) ? false : $GLOBALS['__pluginPackage__'];
+    if ($backtrace) {
+        //这种方法更为准确，但是性能更差 (后者性能约为此方法的6倍)
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $n = count($backtrace);
+        for ($i = 1; $i < $n; $i++) {
+            if (isset($backtrace[$i]['class']) && defined($backtrace[$i]['class'] . '::_pluginPackage')) {
+                return $backtrace[$i]['class']::_pluginPackage;
+            }
+        }
+        return false;
+    } else {
+        //这种方法会导致前置插件无法准确获取包名
+        return empty($GLOBALS['__pluginPackage__']) ? false : $GLOBALS['__pluginPackage__'];
+    }
 }
 
 /**
@@ -43,7 +58,7 @@ function plugin_loadFrontLib(string $package, ...$init_args)
  */
 function writeLog(string $content, string $module = '', string $log_file_name = '', int $level = 2)
 {
-    if($level < MIRAIEZ_LOGGING_LEVEL) return;
+    if ($level < MIRAIEZ_LOGGING_LEVEL) return;
     if (empty($log_file_name) && defined('webhook') && webhook) {
         if (function_exists('plugin_whoami') && $package = plugin_whoami()) {
             $log_file_name = $package;

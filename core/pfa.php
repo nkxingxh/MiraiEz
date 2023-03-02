@@ -45,6 +45,6 @@ function pfa_end()
         }
 
         //输出性能分析结果
-        writeLog($msg, $_DATA['type'], 'MIRAIEZ_PFA');
+        writeLog($msg, $_DATA['type'], 'pfa');
     }
 }
