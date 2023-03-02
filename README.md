@@ -1,6 +1,7 @@
 # MiraiEz
 
-![](https://img.shields.io/github/license/nkxingxh/miraiez.svg)
+![GitHub](https://img.shields.io/github/license/nkxingxh/MiraiEz?style=flat-square)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/nkxingxh/MiraiEz?style=flat-square)
 
 ## [用户手册](https://miraiez.nkxingxh.top/)
 
