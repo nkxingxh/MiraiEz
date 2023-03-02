@@ -17,6 +17,7 @@ class pluginParent
     const _pluginDescription = "MiraiEz 插件核心";
     const _pluginPackage = "top.nkxingxh.miraiez";
     const _pluginVersion = MIRAIEZ_VERSION;
+    const _pluginFrontLib = false;
 
     //构造函数
     public function __construct()
@@ -77,7 +78,7 @@ function loadPlugins(string $dir = 'plugins')
             //if (defined('mdm_cli')) echo "是插件文件\n";
             $GLOBALS['__pluginFile__'] = $__pluginFile__;       //设置当前插件文件名
             $GLOBALS['__pluginPackage__'] = pluginParent::_pluginPackage; //当前插件包名先设置为父插件 (用于兼容 v1 的直接函数挂钩插件)
-            include "$pluginsDir/$__pluginFile__";              //加载插件文件
+            include_once "$pluginsDir/$__pluginFile__";              //加载插件文件
         } else {
             //if (defined('mdm_cli')) echo "不是文件\n";
         }
@@ -190,7 +191,7 @@ function execPluginsFunction(): int
     global $__pluginPackage__;                          //当前正在执行的插件
     foreach ($_plugins as $__plugin__) {            //遍历已注册的插件列表
         if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) { //判断是否已挂钩
-            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);
+            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);   //判断插件是否为 类
             $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : "pluginParent";
             foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
                 $_plugins_count_exec++;                               //计数器加1
@@ -204,7 +205,10 @@ function execPluginsFunction(): int
                 if (isset($return_code) && $return_code === 1)
                     break;
             }
-            unset($__plugin__['object']);                       //释放插件对象
+            //判断是否不是 前置插件
+            if (!($inObject && $__plugin__['object']::_pluginFrontLib)) {
+                unset($__plugin__['object']);   //释放插件对象
+            }
         }
     }
     //返回计数器
@@ -219,4 +223,16 @@ function execPluginsFunction(): int
 function plugin_whoami()
 {
     return empty($GLOBALS['__pluginPackage__']) ? false : $GLOBALS['__pluginPackage__'];
+}
+
+/**
+ * 取得插件支持类对象
+ * 
+ * @param string $package 插件包名
+ */
+function plugin_loadFrontLib(string $package, ...$init_args)
+{
+    global $_plugins;
+    return empty($_plugins[$package]['object']::_pluginFrontLib) ? false
+        : (new $_plugins[$package]['object'](...$init_args));
 }
