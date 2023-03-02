@@ -29,6 +29,9 @@ require_once "$coreDir/easyMirai.php";
 require_once "$coreDir/pluginsHelp.php";
 require_once "$coreDir/OneBotBridge.php";
 
+if (file_exists(baseDir . '/vendor/autoload.php'))
+    require_once baseDir . '/vendor/autoload.php';
+
 $dataDir = getDataDir();
 define("dataDir", $dataDir);
 const MIRAIEZ_VERSION = '2.3.1';
