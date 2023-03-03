@@ -34,11 +34,27 @@ function plugin_whoami(bool $backtrace = MIRAIEZ_PLUGINS_WHOAMI_BACKTRACE)
 }
 
 /**
- * 取得插件支持类对象
+ * 获取前置插件类
  * 
  * @param string $package 插件包名
  */
-function plugin_loadFrontLib(string $package, ...$init_args)
+function plugin_getFrontClass(string $package)
+{
+    global $_plugins;
+    if (!array_key_exists($package, $_plugins)) return null;
+    if (
+        is_object($_plugins[$package]['object']) &&
+        $_plugins[$package]['object']::_pluginFrontLib
+    ) return get_class($_plugins[$package]['object']);
+    else return false;
+}
+
+/**
+ * 加载(实例化)前置插件对象
+ * 
+ * @param string $package 插件包名
+ */
+function plugin_loadFrontObject(string $package, ...$init_args)
 {
     global $_plugins;
     if (!array_key_exists($package, $_plugins)) return null;
