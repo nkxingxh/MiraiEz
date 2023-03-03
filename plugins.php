@@ -27,16 +27,17 @@ class pluginParent
     //初始化插件
     public function _init()
     {
-        hookRegister('miraiezHook', 'FriendMessage');
         return true;
     }
 }
 
-function miraiezHook(): void
+function MiraiEzHook($_DATA): void
 {
     global $_PlainText;
-    if ($_PlainText == '/miraiez') {
-        replyMessage("欢迎使用 MiraiEz! 当前版本: " . pluginParent::_pluginVersion);
+    if ($_PlainText == '/MiraiEz') {
+        replyMessage($_DATA['sender']['id'] == MIRAIEZ_ADMIN_QQ
+            ? ('Hello, MiraiEz! 当前版本: ' . pluginParent::_pluginVersion)
+            : 'Powered By MiraiEz!');
     }
 }
 
@@ -67,6 +68,7 @@ function loadPlugins(string $dir = 'plugins')
 
     //if (defined('mdm_cli')) echo "开始遍历插件目录...\n";
     //遍历所有插件文件
+    global $__pluginFile__;
     foreach ($_plugins_files as $__pluginFile__) {
         //if (defined('mdm_cli')) echo "检查 $__pluginFile__ ";
         //判断是否为 .php 文件
@@ -76,7 +78,7 @@ function loadPlugins(string $dir = 'plugins')
         }
         if (is_file("$pluginsDir/$__pluginFile__")) {
             //if (defined('mdm_cli')) echo "是插件文件\n";
-            $GLOBALS['__pluginFile__'] = $__pluginFile__;       //设置当前插件文件名
+            //$GLOBALS['__pluginFile__'] = $__pluginFile__;       //设置当前插件文件名
             $GLOBALS['__pluginPackage__'] = pluginParent::_pluginPackage; //当前插件包名先设置为父插件 (用于兼容 v1 的直接函数挂钩插件)
             include_once "$pluginsDir/$__pluginFile__";              //加载插件文件
         } else {
@@ -85,6 +87,7 @@ function loadPlugins(string $dir = 'plugins')
     }
     unset($GLOBALS['__pluginFile__'], $GLOBALS['__pluginPackage__'], $_plugins_files);
     //if (defined('mdm_cli')) echo "加载结束\n";
+    hookRegister('MiraiEzHook', 'FriendMessage');
 }
 
 /**
