@@ -47,35 +47,29 @@ if (MIRAIEZ_PFA) pfa_end();
 
 function checkUpdates($_DATA): bool
 {
-    if ($_DATA['type'] == 'FriendMessage')
+    if ($_DATA['type'] == 'FriendMessage') {
         if ($_DATA['sender']['id'] == MIRAIEZ_ADMIN_QQ) {
             global $_PlainText;
-            if ($_PlainText != '检查更新') return false;
+            if (trim($_PlainText) != '检查更新') {
+                return false;
+            }
         } else return false;
-    $url = "https://api.github.com/repos/nkxingxh/miraiez/releases/latest";
+    }
+    $url = 'https://api.github.com/repos/nkxingxh/miraiez/releases/latest';
     $resp = CurlGET($url);
     $resp = json_decode($resp, true);
     if (empty($resp)) {
-        if ($_DATA['type'] == 'FriendMessage') sendFriendMessage(MIRAIEZ_ADMIN_QQ, "miraiez 获取最新版本失败");
+        if ($_DATA['type'] == 'FriendMessage') {
+            sendFriendMessage(MIRAIEZ_ADMIN_QQ, 'MiraiEz 获取最新版本失败');
+        }
         return false;
     }
-    if (compareVersions(MIRAIEZ_VERSION, $resp['tag_name']) == '<')
-        sendFriendMessage(MIRAIEZ_ADMIN_QQ, "miraiez 发现新版本\n当前版本：" . MIRAIEZ_VERSION . "\n最新版本：" . $resp['tag_name']);
-    elseif ($_DATA['type'] == 'FriendMessage') replyMessage("当前已经是最新版本");
-    return true;
-}
-
-function compareVersions($ver1, $ver2): string
-{
-    $verNums1 = (strpos($ver1, '.') === false) ? array($ver1) : explode('.', $ver1);
-    $verNums2 = (strpos($ver2, '.') === false) ? array($ver2) : explode('.', $ver2);
-    if ((int) $verNums1[0] > (int) $verNums2[0]) return '>';
-    elseif ((int)$verNums1[0] < (int)$verNums2[0]) return '<';
-    else {
-        $ver1 = substr($ver1, strpos($ver1, '.') + 1);
-        $ver2 = substr($ver2, strpos($ver2, '.') + 1);
-        return compareVersions($ver1, $ver2);
+    if (version_compare($resp['tag_name'], MIRAIEZ_VERSION)) {
+        sendFriendMessage(MIRAIEZ_ADMIN_QQ, 'MiraiEz 发现新版本\n当前版本: ' . MIRAIEZ_VERSION . "\n最新版本: " . $resp['tag_name']);
+    } elseif ($_DATA['type'] == 'FriendMessage') {
+        replyMessage("当前已经是最新版本");
     }
+    return true;
 }
 
 function verifyAuthorization(): bool
