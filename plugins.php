@@ -92,14 +92,14 @@ function loadPlugins(string $dir = 'plugins')
 
 /**
  * 注册插件
- * @param Object $pluginClass 插件类
+ * @param Object $pluginObject 插件类
  */
-function pluginRegister(Object $pluginClass): bool
+function pluginRegister(Object $pluginObject): bool
 {
     global $_plugins, $__pluginPackage__;
 
-    $__pluginClassName__ = get_class($pluginClass);
-    $__pluginPackage__ = $pluginClass::_pluginPackage;
+    $__pluginClass__ = get_class($pluginObject);
+    $__pluginPackage__ = $pluginObject::_pluginPackage;
 
     if (array_key_exists($__pluginPackage__, $_plugins)) {
         //插件已存在
@@ -110,12 +110,12 @@ function pluginRegister(Object $pluginClass): bool
     $_plugins_count_register++;
     //创建插件对象
     $_plugins[$__pluginPackage__] = array(
-        'name' => $pluginClass::_pluginName,
-        'author' => $pluginClass::_pluginAuthor,
-        'description' => $pluginClass::_pluginDescription,
-        //'package' => $pluginClass::_pluginPackage,
-        'version' => $pluginClass::_pluginVersion,
-        'className' => $__pluginClassName__,
+        'name' => $pluginObject::_pluginName,
+        'author' => $pluginObject::_pluginAuthor,
+        'description' => $pluginObject::_pluginDescription,
+        //'package' => $pluginObject::_pluginPackage,
+        'version' => $pluginObject::_pluginVersion,
+        'class' => $__pluginClass__,
         'file' => $GLOBALS['__pluginFile__'],
         'object' => null,
         'hooked' => null
@@ -123,13 +123,13 @@ function pluginRegister(Object $pluginClass): bool
     if (pluginIsEnable($__pluginPackage__, $GLOBALS['__pluginFile__'])) {
         $_plugins[$__pluginPackage__]['hooked'] = array();
         //初始化插件
-        if ($pluginClass->_init() === false) {                      //插件初始化失败
+        if ($pluginObject->_init() === false) {                      //插件初始化失败
             $_plugins[$__pluginPackage__]['hooked'] = false;
             $_plugins[$__pluginPackage__]['object'] = null;
         } else {
             //计数器
             $_plugins_count_load++;
-            $_plugins[$__pluginPackage__]['object'] = $pluginClass;   //插件初始化成功
+            $_plugins[$__pluginPackage__]['object'] = $pluginObject;   //插件初始化成功
             return true;
         }
     } else {
@@ -214,6 +214,7 @@ function execPluginsFunction(): int
             }
         }
     }
+    unset($GLOBALS['__pluginPackage__']);
     //返回计数器
     return $_plugins_count_exec;
 }

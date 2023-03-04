@@ -10,6 +10,36 @@
  */
 
 /**
+ * 判断指定插件是否成功加载
+ */
+function plugin_isLoaded(string $package)
+{
+    global $_plugins;
+    if (!array_key_exists($package, $_plugins)) {
+        return null;    //插件不存在
+    }
+    return !(empty($_plugins[$package]['object']) || $_plugins[$package]['hooked'] === false);
+}
+
+/**
+ * 获取指定插件信息
+ */
+function plugin_getInfo($package)
+{
+    global $_plugins;
+    if (!array_key_exists($package, $_plugins)) {
+        return null;    //插件不存在
+    }
+    return array(
+        'name' => $_plugins[$package]['name'],
+        'author' => $_plugins[$package]['author'],
+        'description' => $_plugins[$package]['description'],
+        'version' => $_plugins[$package]['version'],
+        'file' => $_plugins[$package]['file']
+    );
+}
+
+/**
  * 获取当前插件身份
  *
  * @param bool $backtrace 是否使用 debug_backtrace 获取堆栈以取得准确的插件信息
@@ -45,7 +75,7 @@ function plugin_getFrontClass(string $package)
     if (
         is_object($_plugins[$package]['object']) &&
         $_plugins[$package]['object']::_pluginFrontLib
-    ) return get_class($_plugins[$package]['object']);
+    ) return $_plugins[$package]['class'];   //get_class($_plugins[$package]['object']);
     else return false;
 }
 
