@@ -16,25 +16,26 @@ function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt =
 
 function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $setopt[] = [CURLOPT_POST, 1];
+    //$setopt[] = [CURLOPT_POST, 1];    //当设置了 CURLOPT_POSTFIELDS 时, CURLOPT_POST 默认为 1
+    //$setopt[] = [CURLOPT_POSTFIELDS, $payload];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
 function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $setopt[] = [CURLOPT_CUSTOMREQUEST, "PUT"];
+    $setopt[] = [CURLOPT_CUSTOMREQUEST, 'PUT'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
 function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $setopt[] = [CURLOPT_CUSTOMREQUEST, "PATCH"];
+    $setopt[] = [CURLOPT_CUSTOMREQUEST, 'PATCH'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
 function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
-    $setopt[] = [CURLOPT_CUSTOMREQUEST, "DELETE"];
+    $setopt[] = [CURLOPT_CUSTOMREQUEST, 'DELETE'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
@@ -58,8 +59,9 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
     curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
 
     if (!empty($setopt) && is_array($setopt)) {
-        foreach ($setopt as $value) {
-            curl_setopt($curl, $value[0], $value[1]);
+        $n = count($setopt);
+        for($i = 0; $i < $n; $i++) {
+            curl_setopt($curl, $setopt[$i][0], $setopt[$i][1]);
         }
     }
 
