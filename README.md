@@ -133,7 +133,7 @@ MiraiEz 根据 **AGPL-3.0 许可证** 进行许可，有关详细信息，请参
 | 命名空间 | 无要求 | 较为严格 |
 | 框架 API 实现 | 全局函数 | 类方法 |
 | 致命错误处理 | 终止运行 | 取消插件载入 |
-| 多账号 | 由插件处理 | 由独立[脚本](https://github.com/MR-XieXuan/MiraiTravel/blob/main/script/Q2771717841.php)处理 |
+| 多账号 | 由[插件](https://miraiez.nkxingxh.top/manual/plugin.html)处理 | 由独立[脚本](https://github.com/MR-XieXuan/MiraiTravel/blob/main/script/Q2771717841.php)处理 |
 
 ## 鸣谢
 
