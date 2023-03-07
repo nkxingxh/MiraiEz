@@ -198,9 +198,11 @@ function execPluginsFunction(): int
             $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : "pluginParent";
             foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
                 $_plugins_count_exec++;                               //计数器加1
-                if ($inObject) { //判断插件对象是否存在
+                if ($inObject && is_string($__hooked_func__)) { //判断插件对象是否存在
+                    //类方法
                     $return_code = $__plugin__['object']->$__hooked_func__($_DATA);
                 } else {
+                    //全局函数与闭包函数
                     $return_code = $__hooked_func__($_DATA);
                 }
 
