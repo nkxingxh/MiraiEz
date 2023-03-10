@@ -140,9 +140,14 @@ class MiraiEzCommand extends pluginParent
 
     /**
      * 解析字符串命令
+     * @param string $cmd 被解析的字符串
+     * @param int $needNum 需要解析多少个, needNum != 0 , 负数代表全部解析 
      */
-    public static function parseCommand(string $cmd): array
+    public static function parseCommand(string $cmd, int $needNum = -1): array
     {
+        if ($needNum) {
+            return false;
+        }
         $args = [];
         $now = '';          //当前读取的参数内容
         $isBegin = false;   //是否已经在读取一个参数
@@ -162,6 +167,9 @@ class MiraiEzCommand extends pluginParent
                         $isBegin = false;
                         $args[] = $now;
                         $now = '';
+                        if (--$needNum) {
+                            break;
+                        }
                     }
                 } else if ($cmd[$i] == '\\') {
                     $i++;
@@ -172,6 +180,9 @@ class MiraiEzCommand extends pluginParent
                         $isBegin = false;
                         $args[] = $now;
                         $now = '';
+                        if (--$needNum) {
+                            break;
+                        }
                     } else {
                         $now = $now . $cmd[$i];
                     }
