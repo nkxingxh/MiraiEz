@@ -50,9 +50,14 @@ function plugin_whoami(bool $backtrace = MIRAIEZ_PLUGINS_WHOAMI_BACKTRACE)
     if ($backtrace) {
         //这种方法更为准确，但是性能更差 (后者性能约为此方法的6倍)
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        //var_dump($backtrace);
         $n = count($backtrace);
         for ($i = 1; $i < $n; $i++) {
-            if (isset($backtrace[$i]['class']) && defined($backtrace[$i]['class'] . '::_pluginPackage')) {
+            if (
+                isset($backtrace[$i]['class']) &&
+                $backtrace[$i]['type'] == '->' &&   //限制为非静态调用
+                defined($backtrace[$i]['class'] . '::_pluginPackage')
+            ) {
                 return $backtrace[$i]['class']::_pluginPackage;
             }
         }

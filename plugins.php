@@ -142,11 +142,11 @@ function pluginRegister(Object $pluginObject): bool
 
 /**
  * 挂钩函数
- * @param string $func
- * @param mixed ...$types
+ * @param mixed $func 要挂钩的方法名、全局函数名或匿名函数
+ * @param string ...$types
  * @return bool
  */
-function hookRegister(string $func, ...$types): bool
+function hookRegister($func, string ...$types): bool
 {
     global $_plugins, $_DATA;
 
