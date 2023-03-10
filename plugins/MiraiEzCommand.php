@@ -141,7 +141,7 @@ class MiraiEzCommand extends pluginParent
     /**
      * 解析字符串命令
      * @param string $cmd 被解析的字符串
-     * @param int $limit 需要解析多少个, 负数代表全部解析 
+     * @param int $limit 需要解析多少个, 0 代表全部解析 
      */
     public static function parseCommand(string $cmd, int $limit = 0): array
     {
