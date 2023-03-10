@@ -167,7 +167,7 @@ class MiraiEzCommand extends pluginParent
                         $isBegin = false;
                         $args[] = $now;
                         $now = '';
-                        if (--$needNum) {
+                        if (!(--$needNum)) {
                             break;
                         }
                     }
@@ -180,7 +180,7 @@ class MiraiEzCommand extends pluginParent
                         $isBegin = false;
                         $args[] = $now;
                         $now = '';
-                        if (--$needNum) {
+                        if (!(--$needNum)) {
                             break;
                         }
                     } else {
@@ -209,10 +209,13 @@ class MiraiEzCommand extends pluginParent
         return $args;
     }
 
+    /**
+     * 判断是否为空白字符
+     */
     public static function isspace($char): bool
     {
-        preg_match("/\s/", $char);
-        return (bool)$char;
+        $result = preg_match("/\s/", $char);
+        return (bool)$result;
     }
 }
 
