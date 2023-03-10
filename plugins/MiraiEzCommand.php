@@ -141,17 +141,14 @@ class MiraiEzCommand extends pluginParent
     /**
      * 解析字符串命令
      * @param string $cmd 被解析的字符串
-     * @param int $needNum 需要解析多少个, 负数代表全部解析 
+     * @param int $limit 需要解析多少个, 负数代表全部解析 
      */
-    public static function parseCommand(string $cmd, int $needNum = -1): array
+    public static function parseCommand(string $cmd, int $limit = 0): array
     {
-        if (!$needNum) {
-            return [];
-        }
         $args = [];
-        $now = '';          //当前读取的参数内容
-        $isBegin = false;   //是否已经在读取一个参数
-        $inMark = false;    //是否在双引号内
+        $buffer = '';     //当前读取的参数内容 (缓冲区)
+        $begin = false;   //是否处于参数中
+        $mark = false;    //是否处于引号包含中
         if (class_exists('IntlChar')) {
             $is_space = '\IntlChar::isspace';
         } else {
@@ -159,52 +156,44 @@ class MiraiEzCommand extends pluginParent
         }
 
         for ($i = 0; $i < strlen($cmd); $i++) {
-            if ($isBegin) {
-                if ($is_space($cmd[$i])) {
-                    if ($inMark) {
-                        $now = $now . $cmd[$i];
-                    } else {
-                        $isBegin = false;
-                        $args[] = $now;
-                        $now = '';
-                        if (!(--$needNum)) {
-                            break;
-                        }
+            if ($begin) {   //当前正处于参数中
+                if ($is_space($cmd[$i])) {  //当前字符是否为不可见 (类似空格)
+                    if ($mark) {    //当前正处于引号包含中
+                        $buffer .= $cmd[$i];   //拼接
+                    } else {    //不处于引号包含中，遇到不可见字符，将作为参数分隔符
+                        $begin = false;     //标记不处于参数中
+                        $args[] = $buffer;     //添加参数
+                        $buffer = '';          //重置缓冲区
+                        if (!--$limit) break;   //计数器
                     }
-                } else if ($cmd[$i] == '\\') {
-                    $i++;
-                    $now = $now . $cmd[$i];
-                } else {
-                    if ($inMark && $cmd[$i] == '"') {
-                        $inMark = false;
-                        $isBegin = false;
-                        $args[] = $now;
-                        $now = '';
-                        if (!(--$needNum)) {
-                            break;
-                        }
-                    } else {
-                        $now = $now . $cmd[$i];
-                    }
+                } elseif ($cmd[$i] == '\\') {   //当前字符是否为转义符 '\'
+                    $buffer .= $cmd[++$i];     //位置指向下一个字符并拼接
+                } elseif ($mark && $cmd[$i] == '"') {   //当前处于引号包含中且遇到另一个引号，将作为参数分隔符
+                    $mark = $begin = false;     //标记不处于参数与引号中
+                    $args[] = $buffer;          //添加参数
+                    $buffer = '';           //重置缓冲区
+                    if (!--$limit) break;   //计数器
+                } else {    //其他字符
+                    $buffer = $buffer . $cmd[$i];   //直接拼接
                 }
-            } else {
-                if (!$is_space($cmd[$i])) {
-                    if ($cmd[$i] == '"') {
-                        $inMark = true;
-                        $isBegin = true;
-                    } else if ($cmd[$i] == '\\') {
-                        $i++;
-                        $isBegin = true;
-                        $now = $now  . $cmd[$i];
-                    } else {
-                        $isBegin = true;
-                        $now = $now . $cmd[$i];
-                    }
+            } elseif (!$is_space($cmd[$i])) {   //当前不处于参数中，且当前字符不是空格
+                switch ($cmd[$i]) { //判断当前字符类型
+                    case '"':   //引号
+                        $begin = $mark = true;  //标记当前处于参数中，且处于引号包含中
+                        break;  //结束判断
+                    case '\\':  //转义符
+                        // $begin = true;
+                        // $buffer .= $cmd[++$i];
+                        // break;
+                        $i++;   //位置移到下一个字符
+                    default:    //其他字符
+                        $begin = true;  //标记当前处于参数中
+                        $buffer .= $cmd[$i];    //拼接字符
                 }
             }
         }
-        if (!empty($now)) {
-            $args[] = $now;
+        if (!empty($buffer)) {  //拼接最后一个参数
+            $args[] = $buffer;
         }
         return $args;
     }
