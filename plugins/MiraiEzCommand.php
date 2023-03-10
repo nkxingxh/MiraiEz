@@ -145,7 +145,7 @@ class MiraiEzCommand extends pluginParent
      */
     public static function parseCommand(string $cmd, int $needNum = -1): array
     {
-        if ($needNum) {
+        if (!$needNum) {
             return [];
         }
         $args = [];
