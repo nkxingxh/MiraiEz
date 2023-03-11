@@ -15,7 +15,7 @@ class MiraiEzCommand extends pluginParent
     const _pluginAuthor = "NKXingXh";
     const _pluginDescription = "MiraiEz 命令支持前置插件";
     const _pluginPackage = "top.nkxingxh.MiraiEzCommand";
-    const _pluginVersion = "1.0.0";
+    const _pluginVersion = "1.1.0";
     const _pluginFrontLib = true;
 
     private static int $_maxCmdLen = 1024;
@@ -54,11 +54,7 @@ class MiraiEzCommand extends pluginParent
                             continue;   //跳过
                         }
                         for ($i = 0; $i < $cmdc; $i++) {
-                            if (
-                                !is_string($cmd[$i]) ||
-                                !is_string(self::$_cmdArgs[$i]) ||
-                                strcasecmp($cmd[$i], self::$_cmdArgs[$i]) != 0
-                            ) {    //判断命令是否匹配
+                            if (!self::argcmp($cmd[$i], self::$_cmdArgs[$i])) {    //判断命令是否匹配
                                 continue 2; //不匹配，跳出
                             }
                         }
@@ -90,6 +86,20 @@ class MiraiEzCommand extends pluginParent
 
         foreach ($commands as &$cmd) {
             $cmd = is_array($cmd) ? $cmd : self::parseCommand(trim($cmd));
+            foreach ($cmd as &$v) {
+                $len = strlen($v);
+                //判断是否注册的消息链成员类型
+                if (
+                    is_string($v) &&
+                    substr($v, 0, 1) == '<' &&
+                    substr($v, $len - 1) == '>'
+                ) {
+                    $v = array(
+                        'type' => substr($v, 1, $len - 2)
+                    );
+                }
+            }
+            unset($len);
         }
 
         self::$_regPlugins[$package][] = array(
@@ -201,10 +211,21 @@ class MiraiEzCommand extends pluginParent
     /**
      * 判断是否为空白字符
      */
-    public static function isspace($char): bool
+    public static function isspace(string $char): bool
     {
-        $result = preg_match("/\s/", $char);
-        return (bool)$result;
+        return (bool) preg_match("/\s/", $char);
+    }
+
+    private static function argcmp($arg1, $arg2, bool $strict_case = false): bool
+    {
+        if (gettype($arg1) !== gettype($arg2)) return false;
+        if (is_array($arg1)) {
+            if (empty($arg1['type']) || empty($arg2['type'])) return false;
+            if($arg1['type'] == '*' || $arg2['type'] == '*') return true;
+            $arg1 = $arg1['type'];
+            $arg2 = $arg2['type'];
+        }
+        return ($strict_case ? strcmp($arg1, $arg2) : strcasecmp($arg1, $arg2)) == 0;
     }
 }
 
