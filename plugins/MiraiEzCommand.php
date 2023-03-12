@@ -15,7 +15,7 @@ class MiraiEzCommand extends pluginParent
     const _pluginAuthor = "NKXingXh";
     const _pluginDescription = "MiraiEz 命令支持前置插件";
     const _pluginPackage = "top.nkxingxh.MiraiEzCommand";
-    const _pluginVersion = "1.1.0";
+    const _pluginVersion = "1.1.1";
     const _pluginFrontLib = true;
 
     private static int $_maxCmdLen = 1024;
@@ -60,14 +60,17 @@ class MiraiEzCommand extends pluginParent
                         }
                         //执行注册的函数
                         $return_code = $_plugin_reg_['func']($_DATA, self::$_cmdArgc, self::$_cmdArgs);
-                        if ($return_code === 1) {
+                        if ($return_code === 1 || $return_code === 2) {
                             break 3;    //拦截
+                        } else {
+                            continue 2;     //下一个注册项
                         }
-                        continue 2;     //下一个注册项
                     }
                 }
             }
             $__pluginPackage__ = self::_pluginPackage;  //恢复包名
+            if ($return_code === 1) return 1;   //拦截 hook
+            else return 0;
         }, 'FriendMessage', 'GroupMessage');
         return true;
     }
@@ -221,7 +224,7 @@ class MiraiEzCommand extends pluginParent
         if (gettype($arg1) !== gettype($arg2)) return false;
         if (is_array($arg1)) {
             if (empty($arg1['type']) || empty($arg2['type'])) return false;
-            if($arg1['type'] == '*' || $arg2['type'] == '*') return true;
+            if ($arg1['type'] == '*' || $arg2['type'] == '*') return true;
             $arg1 = $arg1['type'];
             $arg2 = $arg2['type'];
         }
