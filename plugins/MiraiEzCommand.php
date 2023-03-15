@@ -15,7 +15,7 @@ class MiraiEzCommand extends pluginParent
     const _pluginAuthor = "NKXingXh";
     const _pluginDescription = "MiraiEz 命令支持前置插件";
     const _pluginPackage = "top.nkxingxh.MiraiEzCommand";
-    const _pluginVersion = "1.1.1";
+    const _pluginVersion = "1.2.0";
     const _pluginFrontLib = true;
 
     private static int $_maxCmdLen = 1024;
@@ -29,7 +29,7 @@ class MiraiEzCommand extends pluginParent
         parent::__construct();
     }
 
-    public function _init()
+    public function _init(): bool
     {
         // echo "Hello: " . plugin_whoami(true) . "\n";
         hookRegister(function ($_DATA) {
@@ -37,7 +37,7 @@ class MiraiEzCommand extends pluginParent
             if (
                 mb_strlen($_PlainText) > self::$_maxCmdLen ||
                 !in_array(substr($_PlainText, 0, 1), self::$_cmdStartWith)
-            ) return;
+            ) return 0;
 
             //解析命令参数
             self::$_cmdArgs = self::parseMessageChain($_DATA['messageChain']);
@@ -46,7 +46,7 @@ class MiraiEzCommand extends pluginParent
             //执行 cmdRegister 注册的函数
             global $__pluginPackage__;
             foreach (self::$_regPlugins as $__pluginPackage__ => $_plugin_) {
-                foreach ($_plugin_ as $_plugin_reg_) {
+                foreach ($_plugin_['reg'] as $_plugin_reg_) {
                     foreach ($_plugin_reg_['cmds'] as $cmd) {
                         //判断注册的命令与当前是否匹配
                         $cmdc = count($cmd);
@@ -59,7 +59,22 @@ class MiraiEzCommand extends pluginParent
                             }
                         }
                         //执行注册的函数
-                        $return_code = $_plugin_reg_['func']($_DATA, self::$_cmdArgc, self::$_cmdArgs);
+                        if (is_string($_plugin_reg_['func'])) {
+                            writeLog(
+                                "package: $__pluginPackage__, "
+                                    . json_encode($GLOBALS['_plugins'][$__pluginPackage__], JSON_UNESCAPED_UNICODE)
+                                    . ", is_object: " . (is_object($GLOBALS['_plugins'][$__pluginPackage__]['object']) ? 'True' : 'False')
+                                    . ", " . json_encode($_plugin_reg_, JSON_UNESCAPED_UNICODE),
+                                'exec',
+                                'MiraiEzCommand',
+                                1
+                            );
+                            $func = $_plugin_reg_['func'];
+                            $return_code = $_plugin_['object']->$func($_DATA, self::$_cmdArgc, self::$_cmdArgs);
+                            unset($func);
+                        } else {
+                            $return_code = $_plugin_reg_['func']($_DATA, self::$_cmdArgc, self::$_cmdArgs);
+                        }
                         if ($return_code === 1 || $return_code === 2) {
                             break 3;    //拦截
                         } else {
@@ -67,9 +82,11 @@ class MiraiEzCommand extends pluginParent
                         }
                     }
                 }
+                //释放已使用的资源
+                unset(self::$_regPlugins[$__pluginPackage__]);
             }
             $__pluginPackage__ = self::_pluginPackage;  //恢复包名
-            if ($return_code === 1) return 1;   //拦截 hook
+            if (($return_code ?? 0) === 1) return 1;   //拦截 hook
             else return 0;
         }, 'FriendMessage', 'GroupMessage');
         return true;
@@ -78,13 +95,29 @@ class MiraiEzCommand extends pluginParent
     /**
      * 命令注册
      */
-    public static function cmdRegister(Closure $func, ...$commands): bool
+    public static function cmdRegister($func, ...$commands): bool
     {
         // echo "Hello: " . plugin_whoami(true) . "\n";
         $package = plugin_whoami();
         if (empty($package)) return false;
         if (!isset(self::$_regPlugins[$package]) || !is_array(self::$_regPlugins[$package])) {
-            self::$_regPlugins[$package] = array();
+            self::$_regPlugins[$package] = array(
+                'object' => $GLOBALS['_plugins'][$package]['object'],   //引用 Object 避免被释放
+                'reg' => array()
+            );
+        }
+
+        /**
+         * ~~此时位于各插件的 init 阶段，“当前”插件的对象 (Object) 一定是不在 $GLOBALS['_plugins'][$package] 中的~~
+         * 已在 MiraiEz 2.4.1 中将插件对象赋值提前至 _init 前
+         */
+
+        //判断注册的函数是否存在
+        if (!(is_string($func)
+            ? method_exists($GLOBALS['_plugins'][$package]['object'], $func)
+            : is_callable($func))) {
+            writeLog("$func 不存在", 'reg', 'MiraiEzCommand', 1);
+            return false;
         }
 
         foreach ($commands as &$cmd) {
@@ -105,7 +138,7 @@ class MiraiEzCommand extends pluginParent
             unset($len);
         }
 
-        self::$_regPlugins[$package][] = array(
+        self::$_regPlugins[$package]['reg'][] = array(
             'func' => $func,
             'cmds' => $commands
         );
@@ -197,7 +230,7 @@ class MiraiEzCommand extends pluginParent
                     case '\\':  //转义符
                         // $begin = true;
                         // $buffer .= $cmd[++$i];
-                        // break;
+                        // break;   //有重复操作, 直接执行下一个语句块
                         $i++;   //位置移到下一个字符
                     default:    //其他字符
                         $begin = true;  //标记当前处于参数中
@@ -234,7 +267,11 @@ class MiraiEzCommand extends pluginParent
 
 pluginRegister(new MiraiEzCommand);
 
-function cmdRegister(Closure $func, ...$commands): bool
+/**
+ * 注册命令
+ * @param mixed $func 要注册的方法名或闭包函数 (Closure)
+ */
+function cmdRegister($func, ...$commands): bool
 {
     return MiraiEzCommand::cmdRegister($func, ...$commands);
 }

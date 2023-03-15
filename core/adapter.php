@@ -9,8 +9,8 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
- /**HTTP 适配器相关 */
- /**
+/**HTTP 适配器相关 */
+/**
  * 自动接口适配器
  * 自动调用对应接口执行命令
  */
@@ -122,4 +122,11 @@ function HttpAdapter_release($sessionKey, $qq)
     } elseif ($resp['code'] != 0) {
     }
     return $resp;
+}
+
+function webhook_whoami()
+{
+    if (defined('webhook') && webhook)
+        return (int) $_SERVER['HTTP_BOT'];
+    else return false;
 }

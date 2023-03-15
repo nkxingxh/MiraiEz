@@ -10,6 +10,40 @@
  */
 
 /**
+ * 获取插件列表
+ */
+function pluginsList($provide_infos = false)
+{
+    $plugins = array(
+        'active' => array(),
+        'failed' => array(),
+        'disabled' => array()
+    );
+    global $_plugins;
+    foreach ($_plugins as $package => $plugin) {
+        //未启用
+        if (isset($plugin['object']) && $plugin['object'] === false) {
+            $current_type = 'disabled';
+        } elseif ($plugin['hooked'] === false) {
+            $current_type = 'failed';
+        } else {
+            $current_type = 'active';
+        }
+        if ($provide_infos) {
+            $plugins[$current_type][] = array(
+                'name' => $plugin['name'],
+                'author' => $plugin['author'],
+                'description' => $plugin['description'],
+                'version' => $plugin['version']
+            );
+        } else {
+            $plugins[$current_type][$package] = $plugin['version'];
+        }
+    }
+    return $plugins;
+}
+
+/**
  * 判断指定插件是否成功加载
  */
 function plugin_isLoaded(string $package)

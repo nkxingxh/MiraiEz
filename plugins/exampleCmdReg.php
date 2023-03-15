@@ -34,7 +34,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
                 replyMessage("成功注册了一条纯文本命令。\nargc: $argc\nargs: " . json_encode($args, JSON_UNESCAPED_UNICODE));
             }
         }, '/exampleCmd text');
-        cmdRegister(function ($_DATA, $argc, $args) {
+        cmdRegister(function ($_DATA) {
             if (self::isdebugchat($_DATA)) {
                 $package = plugin_whoami();
                 replyMessage("当前插件身份: $package");
@@ -53,7 +53,7 @@ pluginRegister(new class extends pluginParent   //建议继承 pluginParent 插�
         return true;
     }
 
-    private static function isdebugchat($_DATA)
+    private static function isdebugchat($_DATA): bool
     {
         return $_DATA['type'] == 'GroupMessage'
             ? in_array($_DATA['sender']['group']['id'], $GLOBALS['MIRAIEZ_DEBUG_GROUPS'])

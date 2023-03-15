@@ -64,8 +64,8 @@ function checkUpdates($_DATA): bool
         }
         return false;
     }
-    if (version_compare($resp['tag_name'], MIRAIEZ_VERSION)) {
-        sendFriendMessage(MIRAIEZ_ADMIN_QQ, 'MiraiEz 发现新版本\n当前版本: ' . MIRAIEZ_VERSION . "\n最新版本: " . $resp['tag_name']);
+    if (version_compare($resp['tag_name'], MIRAIEZ_VERSION, '>')) {
+        sendFriendMessage(MIRAIEZ_ADMIN_QQ, "MiraiEz 发现新版本\n当前版本: " . MIRAIEZ_VERSION . "\n最新版本: " . $resp['tag_name']);
     } elseif ($_DATA['type'] == 'FriendMessage') {
         replyMessage("当前已经是最新版本");
     }
