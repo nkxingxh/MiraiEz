@@ -15,7 +15,7 @@ class MiraiEzCommand extends pluginParent
     const _pluginAuthor = "NKXingXh";
     const _pluginDescription = "MiraiEz 命令支持前置插件";
     const _pluginPackage = "top.nkxingxh.MiraiEzCommand";
-    const _pluginVersion = "1.2.0";
+    const _pluginVersion = "1.2.1";
     const _pluginFrontLib = true;
 
     private static int $_maxCmdLen = 1024;
@@ -254,12 +254,21 @@ class MiraiEzCommand extends pluginParent
 
     private static function argcmp($arg1, $arg2, bool $strict_case = false): bool
     {
+        //Plain 类型特判
+        if (
+            (is_array($arg1) && ($arg1['type'] ?? null) === 'Plain' && is_string($arg2)) ||
+            (is_array($arg2) && ($arg2['type'] ?? null) === 'Plain' && is_string($arg1))
+        ) return true;
+        //其他类型
         if (gettype($arg1) !== gettype($arg2)) return false;
         if (is_array($arg1)) {
             if (empty($arg1['type']) || empty($arg2['type'])) return false;
             if ($arg1['type'] == '*' || $arg2['type'] == '*') return true;
             $arg1 = $arg1['type'];
             $arg2 = $arg2['type'];
+        } else {
+            //使用 Plain 类型特判，不使用 *
+            // if ($arg1 == '*' || $arg2 == '*') return true;
         }
         return ($strict_case ? strcmp($arg1, $arg2) : strcasecmp($arg1, $arg2)) == 0;
     }
