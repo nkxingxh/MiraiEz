@@ -12,15 +12,15 @@
 /**
  * 获取插件列表
  */
-function pluginsList($provide_infos = false)
+function pluginsList($provide_infos = false): ?array
 {
     $plugins = array(
         'active' => array(),
         'failed' => array(),
         'disabled' => array()
     );
-    global $_plugins;
-    foreach ($_plugins as $package => $plugin) {
+    if(!isset($GLOBALS['_plugins'])) return null;
+    foreach ($GLOBALS['_plugins'] as $package => $plugin) {
         //未启用
         if (isset($plugin['object']) && $plugin['object'] === false) {
             $current_type = 'disabled';
@@ -46,7 +46,7 @@ function pluginsList($provide_infos = false)
 /**
  * 判断指定插件是否成功加载
  */
-function plugin_isLoaded(string $package)
+function plugin_isLoaded(string $package): ?bool
 {
     global $_plugins;
     if (!array_key_exists($package, $_plugins)) {
@@ -58,7 +58,7 @@ function plugin_isLoaded(string $package)
 /**
  * 获取指定插件信息
  */
-function plugin_getInfo($package)
+function plugin_getInfo($package): ?array
 {
     global $_plugins;
     if (!array_key_exists($package, $_plugins)) {
