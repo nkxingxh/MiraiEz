@@ -12,7 +12,7 @@
 /**
  * 获取插件列表
  */
-function pluginsList($provide_infos = false)
+function pluginsList(bool $provide_infos = false): ?array
 {
     $plugins = array(
         'active' => array(),
@@ -58,7 +58,7 @@ function plugin_isLoaded(string $package)
 /**
  * 获取指定插件信息
  */
-function plugin_getInfo($package)
+function plugin_getInfo(string $package): ?array
 {
     global $_plugins;
     if (!array_key_exists($package, $_plugins)) {
@@ -188,7 +188,7 @@ function getDataDir(): string
     return $dir;
 }
 
-function getConfig($configFile = '')
+function getConfig(string $configFile = '')
 {
     $configFile = str_replace('./', '.', $configFile);
     $configFile = str_replace('.\\', '.', $configFile);
