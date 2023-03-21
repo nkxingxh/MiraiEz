@@ -43,7 +43,7 @@ function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
         'messageChain' => $messageChain
     );
     if (!empty($quote)) $content['quote'] = $quote;
-    return autoAdapter(sendFriendMessage, $content);
+    return autoAdapter(__FUNCTION__, $content);
 }
 
 /**
