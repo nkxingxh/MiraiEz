@@ -9,7 +9,27 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-/**消息发送与撤回 */
+/**消息发送、获取与撤回 */
+
+/**
+ * (缓存操作) 通过messageId获取消息
+ */
+function messageFromId($messageId = true, $target = true, $sessionKey = '')
+{
+    if ($messageId === true) {
+        if (!isMessage() || $GLOBALS['_DATA']['messageChain'][0]['type'] !== 'Source') return false;
+        $messageId = $GLOBALS['_DATA']['messageChain'][0]['id'];
+    } else {
+        $messageId = (int) $messageId;
+    }
+    $target = ($target === true) ? getCurrentGroupId() : ((int) $target);
+    if (empty($messageId) || empty($target)) return false;
+    return HttpAdapter(__FUNCTION__, array(
+        'sessionKey' => $sessionKey,
+        'messageId' => $messageId,
+        'target' => $target
+    ));
+}
 
 /**
  * 发送好友消息
@@ -23,7 +43,7 @@ function sendFriendMessage($target, $messageChain, $quote = 0, $sessionKey = '')
         'messageChain' => $messageChain
     );
     if (!empty($quote)) $content['quote'] = $quote;
-    return autoAdapter('sendFriendMessage', $content);
+    return autoAdapter(sendFriendMessage, $content);
 }
 
 /**
