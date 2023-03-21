@@ -423,3 +423,9 @@ function getCurrentGroupId()
     if (isset($GLOBALS['_DATA']['groupId'])) return $GLOBALS['_DATA']['groupId'];
     return false;
 }
+
+function getCurrentTarget()
+{
+    $target = getCurrentGroupId();
+    return empty($target) ? getCurrentSenderId() : $target;
+}

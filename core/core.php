@@ -22,7 +22,7 @@ function messageFromId($messageId = true, $target = true, $sessionKey = '')
     } else {
         $messageId = (int) $messageId;
     }
-    $target = ($target === true) ? getCurrentGroupId() : ((int) $target);
+    $target = ($target === true) ? getCurrentTarget() : ((int) $target);
     if (empty($messageId) || empty($target)) return false;
     return HttpAdapter(__FUNCTION__, array(
         'sessionKey' => $sessionKey,
