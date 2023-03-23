@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2023 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -19,7 +20,7 @@ require_once "$coreDir/miraiOneBot.php";
  */
 function OneBot_auth(): bool
 {
-    if(!OneBotBridge) return false;
+    if (!OneBotBridge) return false;
     //writeLog("验证开始", "Auth", "OneBot");
     $config = OneBot_get_config();
     $auth = false;
@@ -40,12 +41,12 @@ function OneBot_auth(): bool
         $auth = true;
 
         $self_qq = $_SERVER['HTTP_X_SELF_ID'];
-        if (!isset($config['enable'][$self_qq]) || !is_array($config['enable'][$self_qq])) {
+        if (empty($config['enable'][$self_qq])) {
             return false;       //未配置处理类型，不予处理
         }
 
         $_SERVER['HTTP_BOT'] = $self_qq;    //兼容 mirai-api-http 标准
-        define('bot', $self_qq);
+        //define('bot', $self_qq);      //webhook中会定义，此处不定义
 
         //方便调用
         define('OneBot11_secret', $config['OneBot11_secret']);
@@ -122,9 +123,9 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
     writeLog(json_encode($d, JSON_UNESCAPED_UNICODE), __FUNCTION__, 'OneBot', 1);
 
     //不在处理范围内，不予处理
-    if (is_array($allowType) && !empty($type)) {
-        if (!in_array($type, $allowType)) return false;
-    } elseif ($allowType !== true) return false;
+    if (is_array($allowType) ? (!in_array($type, $allowType)) : ($allowType !== true)) {
+        return false;
+    }
 
     writeLog("上报类型 $type 在处理范围内, 开始转换消息类型", '11mirai', 'OneBot', 1);
 
@@ -191,7 +192,7 @@ function OneBot_11mirai($d = null, $allowType = array(), $replace_global_data = 
                     ) {
                         return false;
                     }*/
-                    if($d['user_id'] == $d['self_tiny_id']) return false;
+                    if ($d['user_id'] == $d['self_tiny_id']) return false;
 
                     writeLog("正在处理频道消息", 'Guild', 'OneBot', 1);
 
@@ -531,14 +532,22 @@ function OneBot_messageChain2CQCode($messageChain)
         case 'Image':
             $type = 'image';
             $d = array(
-                'file' => empty($messageChain['url']) ? (empty($messageChain['path']) ? $messageChain['base64'] : $messageChain['path']) : $messageChain['url']
+                'file' => empty($messageChain['url'])
+                    ? (empty($messageChain['path'])
+                        ? $messageChain['base64']
+                        : $messageChain['path'])
+                    : $messageChain['url']
             );
             break;
 
         case 'FlashImage':
             $type = 'image';
             $d = array(
-                'file' => empty($messageChain['url']) ? (empty($messageChain['path']) ? $messageChain['base64'] : $messageChain['path']) : $messageChain['url'],
+                'file' => empty($messageChain['url'])
+                    ? (empty($messageChain['path'])
+                        ? $messageChain['base64']
+                        : $messageChain['path'])
+                    : $messageChain['url'],
                 'type' => 'flash'
             );
             break;
@@ -546,14 +555,22 @@ function OneBot_messageChain2CQCode($messageChain)
         case 'Voice':
             $type = 'record';
             $d = array(
-                'file' => empty($messageChain['url']) ? (empty($messageChain['path']) ? $messageChain['base64'] : $messageChain['path']) : $messageChain['url']
+                'file' => empty($messageChain['url'])
+                    ? (empty($messageChain['path'])
+                        ? $messageChain['base64']
+                        : $messageChain['path'])
+                    : $messageChain['url']
             );
             break;
 
         case 'Video':           // 拓展类型
             $type = 'video';
             $d = array(
-                'file' => empty($messageChain['url']) ? (empty($messageChain['path']) ? $messageChain['base64'] : $messageChain['path']) : $messageChain['url']
+                'file' => empty($messageChain['url'])
+                    ? (empty($messageChain['path'])
+                        ? $messageChain['base64']
+                        : $messageChain['path'])
+                    : $messageChain['url']
             );
             break;
 
@@ -568,19 +585,19 @@ function OneBot_messageChain2CQCode($messageChain)
                     $d = array('type' => 2, 'id' => -1);
                     break;
 
-                case 'ShowLove':
+                case 'Like':
                     $d = array('type' => 3, 'id' => -1);
                     break;
 
-                case 'ShowLove':
+                case 'Heartbroken':
                     $d = array('type' => 4, 'id' => -1);
                     break;
 
-                case 'ShowLove':
+                case 'SixSixSix':
                     $d = array('type' => 5, 'id' => -1);
                     break;
 
-                case 'ShowLove':
+                case 'FangDaZhao':
                     $d = array('type' => 6, 'id' => -1);
                     break;
 
@@ -612,7 +629,7 @@ function OneBot_messageChain2CQCode($messageChain)
         $val = OneBot_CQEscape($val);
         $CQCode .= "$key=$val,";
     }
-    return substr_replace($CQCode, ']', strlen($CQCode) - 1);
+    return substr_replace($CQCode, ']', strlen($CQCode) - 1);   //将末尾的 ',' 替换为 ']'
 }
 
 function OneBot_CQEscape($str, $comma = false)
@@ -663,7 +680,15 @@ function OneBot_API_bridge_11($command, $content = array())
     switch ($command) {
         case 'sendFriendMessage':
             $d = array(
-                'user_id' => $content['target'],
+                'user_id' => empty($content['target']) ? $content['qq'] : $content['target'],
+                'message' => OneBot_messageChain2OneBot($content['messageChain']),
+                'auto_escape' => false
+            );
+            break;
+
+        case 'sendGroupMessage':
+            $d = array(
+                'group_id' => empty($content['target']) ? $content['group'] : $content['target'],
                 'message' => OneBot_messageChain2OneBot($content['messageChain']),
                 'auto_escape' => false
             );
@@ -691,7 +716,7 @@ function OneBot_API_11($command, $d = array())
 
     $d = json_encode($d);
     $header = array('Content-Type: application/json');
-    if (!empty(OneBot11_access_token)) $header[] = "MIRAIEZ_WEBHOOK_AUTH: Bearer " . OneBot11_access_token;
+    if (!empty(OneBot11_access_token)) $header[] = "Authorization: Bearer " . OneBot11_access_token;
 
     $url = OneBot11_HTTP_API . '/' . $command;
     writeLog($d, $url, 'OneBot', 1);
@@ -711,6 +736,7 @@ function OneBot_API_cmd2path11($command)
 {
     $command_map = array(
         'sendFriendMessage' => 'send_private_msg',
+        'sendGroupMessage' => 'send_group_msg',
         'sendGuildChannelMessage' => 'send_guild_channel_msg'
     );
     if (empty($command_map[$command])) return false;
