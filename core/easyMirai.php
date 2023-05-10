@@ -18,7 +18,7 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
     if (!file_exists($file)) file_put_contents($file, "[]");
     $session = file_get_contents($file);
     $session = json_decode($session, true);
-    if (json_last_error() != JSON_ERROR_NONE || is_array($session) == false) {
+    if (json_last_error() != JSON_ERROR_NONE || !is_array($session)) {
         file_put_contents($file, "[]");
         $session = array();
     }
@@ -80,13 +80,12 @@ function getSessionKey($qq = 0, $forceUpdateSessionKey = false)
 /**
  * 判断指定群是否存在指定成员
  * @param int $groupID      群号（传入true则表示当前收到的消息所在群号）
- * @param int $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
+ * @param int|bool|null $target       指定QQ号（留空表示Bot的QQ，传入true则表示当前收到的消息的发送者QQ）
  * 
  * @return bool|null         如果该成员在群中返回 true 反之返回 false，失败返回 null
  */
-function isInGroup($groupID = true, $target = null)
+function isInGroup($groupID = true, $target = null): ?bool
 {
-
     if ($groupID === true) {
         $groupID = getCurrentGroupId();
         if (!$groupID) return false;
@@ -97,6 +96,7 @@ function isInGroup($groupID = true, $target = null)
         if (!$target) return false;
     } elseif ($target === null) {
         if (defined('bot')) $target = bot;
+        else return null;
     } else $target = (int) $target;
 
     $resp = memberList($groupID);
@@ -106,6 +106,30 @@ function isInGroup($groupID = true, $target = null)
 
     foreach ($resp['data'] as $v) {
         if ($v['id'] == $target) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * 判断消息链中是否 At 某人
+ * 
+ * @param int|null $target 要判断的目标成员 (留空为 bot)
+ * @param array|null $messageChain 消息链数组 (留空为当前收到的消息)
+ */
+function isAtSb(int $target = null, array $messageChain = null): ?bool
+{
+    if (empty($target)) {
+        if (defined('bot')) $target = bot;
+        else return null;
+    }
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
+    }
+    foreach ($messageChain as $v) {
+        if ($v['type'] === 'At' && $v['target'] == $target) {
             return true;
         }
     }
@@ -136,11 +160,11 @@ function getGroupPermission($groupID = true, $sessionKey = '')
 /**
  * 获取消息链中的文本
  */
-function messageChain2PlainText($messageChain = null)
+function messageChain2PlainText($messageChain = null): ?string
 {
-    if (empty($messageChain) && defined('webhook') && webhook) {
-        global $_DATA;
-        $messageChain = $_DATA['messageChain'];
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
     }
     $text = '';
     $n = count($messageChain);
@@ -156,11 +180,11 @@ function messageChain2PlainText($messageChain = null)
  * 获取消息链中的图片 Url
  * 返回 Url 数组
  */
-function messageChain2ImageUrl($messageChain = null)
+function messageChain2ImageUrl($messageChain = null): ?array
 {
-    if (empty($messageChain) && defined('webhook') && webhook) {
-        global $_DATA;
-        $messageChain = $_DATA['messageChain'];
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
     }
     $url = array();
     $n = count($messageChain);
@@ -176,11 +200,11 @@ function messageChain2ImageUrl($messageChain = null)
  * 获取消息链中的 At
  * 返回数组
  */
-function messageChain2At($messageChain = null)
+function messageChain2At($messageChain = null): ?array
 {
-    if (empty($messageChain) && defined('webhook') && webhook) {
-        global $_DATA;
-        $messageChain = $_DATA['messageChain'];
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
     }
     $At = array();
     $n = count($messageChain);
@@ -198,11 +222,11 @@ function messageChain2At($messageChain = null)
  * 获取消息链中的 Voice URL
  * 返回数组
  */
-function messageChain2Voice($messageChain = null)
+function messageChain2Voice($messageChain = null): ?array
 {
-    if (empty($messageChain) && defined('webhook') && webhook) {
-        global $_DATA;
-        $messageChain = $_DATA['messageChain'];
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
     }
     $Voice = array();
     $n = count($messageChain);
@@ -237,20 +261,17 @@ function messageChain2Quote($messageChain = null)
  */
 function messageChain2FileId($messageChain = null)
 {
-    if (empty($messageChain) && defined('webhook') && webhook) {
-        global $_DATA;
-        $messageChain = $_DATA['messageChain'];
+    if (empty($messageChain)) {
+        if (isset($GLOBALS['_DATA']['messageChain'])) $messageChain = $GLOBALS['_DATA']['messageChain'];
+        else return null;
     }
-    if (isMessage($_DATA['type'])) {
-        //这里不需要考虑消息顺序，故使用 foreach 效率较高
-        foreach ($messageChain as $value) {
-            if ($value['type'] == 'File') {
-                $id = $value['id'];
-                break;
-            }
+    //这里不需要考虑消息顺序，故使用 foreach 效率较高
+    foreach ($messageChain as $v) {
+        if ($v['type'] == 'File') {
+            return $v['id'];
         }
-        if (isset($id) && $id === true) return false;
-    } else return false;
+    }
+    return false;
 }
 
 /**
@@ -259,15 +280,15 @@ function messageChain2FileId($messageChain = null)
  * 可自动判断好友消息/群消息/临时消息
  * 
  * @param array|string $messageChain    消息链
- * @param int $quote                    要引用的消息 ID (0 为不引用, true 为自动引用, 其他 int 整数为 消息ID)
- * @param int $at                       要 @ 的人 (0 为不 @, true 为自动 @, 其他 int 整数为 qq 号或频道 tiny_id)
+ * @param int|bool $quote                    要引用的消息 ID (0 为不引用, true 为自动引用, 其他 int 整数为 消息ID)
+ * @param int|bool $at                       要 @ 的人 (0 为不 @, true 为自动 @, 其他 int 整数为 qq 号或频道 tiny_id)
  */
 function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 {
     $messageChain = is_array($messageChain) ? $messageChain : getMessageChain($messageChain);
     global $_DATA, $_ImageUrl;
     //在临时消息中,回复带有图片的消息会出 bug
-    if ($quote === true && isset($_DATA['messageChain'][0]['id']) && ($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0) == false) {
+    if ($quote === true && isset($_DATA['messageChain'][0]['id']) && !($_DATA['type'] === 'TempMessage' && count($_ImageUrl) > 0)) {
         $quote = $_DATA['messageChain'][0]['id'];
     } else $quote = (int) $quote;
     $at = in_array($_DATA['type'], ['GroupMessage', 'GuildChannelMessage']) ? ($at === true ? $_DATA['sender']['id'] : $at) : 0;
@@ -291,11 +312,11 @@ function replyMessage($messageChain, $quote = 0, $at = 0, $sessionKey = '')
 
 /**
  * 获取消息链
- * @param string @PlainText             消息文本
+ * @param string $PlainText             消息文本
  * @param string|array $Images          图片链接或 base64 (可以是数组)
  * @param int|array  $AtTarget          要 At 的 QQ 号(可以是数组)
  */
-function getMessageChain($PlainText = '', $Images = '', $AtTarget = 0)
+function getMessageChain(string $PlainText = '', $Images = '', $AtTarget = 0): array
 {
     $MessageChain = array();
     if (!empty($AtTarget)) {
@@ -317,7 +338,6 @@ function getMessageChain($PlainText = '', $Images = '', $AtTarget = 0)
         } else $MessageChain[] = getMessageChain_PlainText($PlainText);
     }
 
-
     if (!empty($Images)) {
         if (!is_array($Images)) {
             $Images = array($Images);
@@ -338,32 +358,32 @@ function getMessageChain($PlainText = '', $Images = '', $AtTarget = 0)
     return $MessageChain;
 }
 
-function getMessageChain_PlainText($PlainText)
+function getMessageChain_PlainText($PlainText): array
 {
     return array('type' => 'Plain', 'text' => $PlainText);
 }
 
-function getMessageChain_At($target)
+function getMessageChain_At($target): array
 {
     return array('type' => 'At', 'target' => $target);
 }
 
 /**
  * 生产消息链中的图片类型成员 (参数二选一)
- * @param string ImageUrl 图片链接
- * @param string ImageBase64 图片 BASE64 编码后的内容
+ * @param string|null $ImageUrl 图片链接
+ * @param string|null $ImageBase64 图片 BASE64 编码后的内容
  */
-function getMessageChain_Image($ImageUrl = null, $ImageBase64 = null)
+function getMessageChain_Image(string $ImageUrl = null, string $ImageBase64 = null): array
 {
     return array('type' => 'Image', 'url' => $ImageUrl, 'base64' => $ImageBase64);
 }
 
-function getMessageChain_Json($json)
+function getMessageChain_Json($json): array
 {
     return array('type' => 'Json', 'json' => $json);
 }
 
-function isMessage($type = true)
+function isMessage($type = true): bool
 {
     if ($type === true && webhook) {
         global $_DATA;
@@ -379,7 +399,7 @@ function isMessage($type = true)
  * @param bool $isolate_groups  是否隔离不同群的会话
  * @param bool $isolate_PG      是否隔离群聊和私聊消息 (当该参数为 false 时, $isolate_groups 参数不生效)
  */
-function mirai_session_start($isolate_users = true, $isolate_groups = true, $isolate_PG = true)
+function mirai_session_start(bool $isolate_users = true, bool $isolate_groups = true, bool $isolate_PG = true): bool
 {
     if (defined('webhook') && webhook) {
         if (session_status() === PHP_SESSION_ACTIVE) {
