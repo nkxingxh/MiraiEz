@@ -54,7 +54,7 @@ class MiraiEzCommand extends pluginParent
                             continue;   //跳过
                         }
                         for ($i = 0; $i < $cmdc; $i++) {
-                            if (!self::argcmp($cmd[$i], self::$_cmdArgs[$i])) {    //判断命令是否匹配
+                            if (!self::argcmp(self::$_cmdArgs[$i], $cmd[$i])) {    //判断命令是否匹配
                                 continue 2; //不匹配，跳出
                             }
                         }
@@ -252,24 +252,35 @@ class MiraiEzCommand extends pluginParent
         return (bool) preg_match("/\s/", $char);
     }
 
+    /**
+     * 判断传入参数 $arg1 是否与注册参数 $arg2 匹配
+     * @param string|array $arg1 传入参数
+     * @param string|array $arg2 注册参数
+     * @param bool $strict_case 大小写严格
+     */
     private static function argcmp($arg1, $arg2, bool $strict_case = false): bool
     {
-        //Plain 类型特判
+        //注册为 <Plain> 类型特判
         if (
-            (is_array($arg1) && ($arg1['type'] ?? null) === 'Plain' && is_string($arg2)) ||
+            /* (is_array($arg1) && ($arg1['type'] ?? null) === 'Plain' && is_string($arg2)) || */
             (is_array($arg2) && ($arg2['type'] ?? null) === 'Plain' && is_string($arg1))
         ) return true;
-        //其他类型
-        if (gettype($arg1) !== gettype($arg2)) return false;
-        if (is_array($arg1)) {
-            if (empty($arg1['type']) || empty($arg2['type'])) return false;
-            if ($arg1['type'] == '*' || $arg2['type'] == '*') return true;
+
+        //排除情况
+        if (gettype($arg1) !== gettype($arg2)) return false;    //可能情况: 其一为 plain 文本，另一为 其他类型
+        
+        //非文本类型
+        if (is_array($arg1)) {  //判断其中一方为 数组 则另一方也为数组
+            if (empty($arg1['type']) || empty($arg2['type'])) return false; //奇形种
+            if ($arg1['type'] == '*' || $arg2['type'] == '*') return true;  //通配
+            //转换为 类型文本 的判断
             $arg1 = $arg1['type'];
             $arg2 = $arg2['type'];
         } else {
-            //使用 Plain 类型特判，不使用 *
+            //使用 <Plain> 类型特判，不使用 *
             // if ($arg1 == '*' || $arg2 == '*') return true;
         }
+        //文本比较
         return ($strict_case ? strcmp($arg1, $arg2) : strcasecmp($arg1, $arg2)) == 0;
     }
 }
