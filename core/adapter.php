@@ -71,7 +71,7 @@ function HttpAdapter(string $command, array $content = array(), bool $post = nul
             $url = MIRAIEZ_HTTP_API . "/$command";
             $payload = $json ? json_encode($content) : $content;
             writeLog('POST: ' . $url, __FUNCTION__, 'adapter', 1);
-            $resp = CurlPOST($payload, $url);
+            $resp = CurlPOST($payload, $url, null, null, $json ? ['Content-Type: application/json'] : []);
         }
         writeLog('Resp: ' . $resp, __FUNCTION__, 'adapter', 1);
         $resp = json_decode($resp, true);
@@ -87,7 +87,8 @@ function HttpAdapter(string $command, array $content = array(), bool $post = nul
 function HttpAdapter_verify()
 {
     $data = json_encode(array('verifyKey' => MIRAIEZ_HTTP_KEY));
-    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/verify');
+    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/verify', null, null, ['Content-Type: application/json']);
+    writeLog("响应内容: $resp", 'verify', 'core', 1);
     $resp = json_decode($resp, true);
     if (empty($resp)) {
         writeLog("解析数据失败", 'verify', 'core', 1);
@@ -103,7 +104,7 @@ function HttpAdapter_bind($sessionKey, $qq)
 {
     $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq), JSON_UNESCAPED_UNICODE);
     writeLog("请求内容: " . $data, 'bind', 'core', 1);
-    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/bind');
+    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/bind', null, null, ['Content-Type: application/json']);
     $resp = json_decode($resp, true);
     if (empty($resp)) {
         writeLog("解析数据失败", 'bind', 'core', 1);
@@ -116,7 +117,7 @@ function HttpAdapter_bind($sessionKey, $qq)
 function HttpAdapter_release($sessionKey, $qq)
 {
     $data = json_encode(array('sessionKey' => $sessionKey, 'qq' => (int) $qq));
-    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/release');
+    $resp = CurlPOST($data, MIRAIEZ_HTTP_API . '/release', null, null, ['Content-Type: application/json']);
     $resp = json_decode($resp, true);
     if (empty($resp)) {
     } elseif ($resp['code'] != 0) {

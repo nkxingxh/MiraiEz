@@ -9,31 +9,33 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-function CurlGET($url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
+define('MIRAIEZ_CURL_DEBUG', false);
+
+function CurlGET($url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     return Curl(null, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
-function CurlPOST($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
+function CurlPOST($payload, $url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     //$setopt[] = [CURLOPT_POST, 1];    //当设置了 CURLOPT_POSTFIELDS 时, CURLOPT_POST 默认为 1
     //$setopt[] = [CURLOPT_POSTFIELDS, $payload];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
-function CurlPUT($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
+function CurlPUT($payload, $url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     $setopt[] = [CURLOPT_CUSTOMREQUEST, 'PUT'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
-function CurlPATCH($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
+function CurlPATCH($payload, $url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     $setopt[] = [CURLOPT_CUSTOMREQUEST, 'PATCH'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
 }
 
-function CurlDELETE($payload, $url, $cookie = '', $referer = '', $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
+function CurlDELETE($payload, $url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz')
 {
     $setopt[] = [CURLOPT_CUSTOMREQUEST, 'DELETE'];
     return Curl($payload, $url, $cookie, $referer, $header, $setopt, $UserAgent);
@@ -65,7 +67,19 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
         }
     }
 
+    if (MIRAIEZ_CURL_DEBUG) {
+        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+        writeLog($url, '请求', 'curl', 1);
+    }
+
     $response = curl_exec($curl);
+
+    if (MIRAIEZ_CURL_DEBUG) {
+        $req_header = curl_getinfo($curl, CURLINFO_HEADER_OUT);
+        writeLog("请求头信息:\n$req_header", '请求', 'curl', 1);
+        writeLog(curl_getinfo($curl, CURLINFO_HTTP_CODE) . "\n" . $response, '响应', 'curl', 1);
+    }
+
     curl_close($curl);
     return $response;
 }
