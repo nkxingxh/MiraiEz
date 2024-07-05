@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MiraiEz Copyright (c) 2021-2024 NKXingXh
  * License AGPLv3.0: GNU AGPL Version 3 <https://www.gnu.org/licenses/agpl-3.0.html>
@@ -187,7 +188,9 @@ function rand_uuid(): string
  * str_starts_with_non_native
  * 判断字符串是否以特定字符串开始
  */
-function str_starts_with_non_native($haystack, $needle): bool
+function str_starts_with_non_native($haystack, $needle, $case_strict = true): bool
 {
-    return strcmp($needle, substr($haystack, 0, strlen($needle))) === 0;
+    return $case_strict
+        ? strcmp($needle, substr($haystack, 0, strlen($needle))) === 0
+        : strcasecmp($needle, substr($haystack, 0, strlen($needle))) === 0;
 }
