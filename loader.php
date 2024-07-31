@@ -33,7 +33,7 @@ if (file_exists(baseDir . '/vendor/autoload.php'))
     require_once baseDir . '/vendor/autoload.php';
 
 $dataDir = getDataDir();
-define("dataDir", $dataDir);
+// define('dataDir', $dataDir);
 const MIRAIEZ_VERSION = '2.4.1';
 
 require_once "$coreDir/adapter.php";

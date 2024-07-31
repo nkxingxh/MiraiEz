@@ -19,7 +19,7 @@ function pluginsList(bool $provide_infos = false): ?array
         'failed' => array(),
         'disabled' => array()
     );
-    if(!isset($GLOBALS['_plugins'])) return null;
+    if (!isset($GLOBALS['_plugins'])) return null;
     foreach ($GLOBALS['_plugins'] as $package => $plugin) {
         //未启用
         if (isset($plugin['object']) && $plugin['object'] === false) {
@@ -177,6 +177,9 @@ function writeLog(string $content, string $module = '', string $log_file_name = 
 
 function getDataDir(): string
 {
+    if (defined('dataDir')) {
+        return dataDir;
+    }
     $dir = scandir(baseDir);
     foreach ($dir as $value) {
         if (strlen($value) == 21 && is_dir(baseDir . "/$value") && substr($value, 0, 5) == "data_") {
@@ -185,6 +188,7 @@ function getDataDir(): string
     }
     $dir = baseDir . "/data_" . str_rand(16);
     mkdir($dir);
+    define('dataDir', $dir);
     return $dir;
 }
 
