@@ -65,6 +65,9 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
     // curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     // curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 
+    // 设置信任证书
+    curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . '/../config/curl-ca-bundle.crt');
+
     // 返回数据不直接显示
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     // 适配 gzip 压缩
@@ -72,7 +75,7 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
 
     if (!empty($setopt) && is_array($setopt)) {
         $n = count($setopt);
-        for($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $n; $i++) {
             curl_setopt($curl, $setopt[$i][0], $setopt[$i][1]);
         }
     }
@@ -88,6 +91,9 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
         $req_header = curl_getinfo($curl, CURLINFO_HEADER_OUT);
         writeLog("请求头信息:\n$req_header", '请求', 'curl', 1);
         writeLog(curl_getinfo($curl, CURLINFO_HTTP_CODE) . "\n" . $response, '响应', 'curl', 1);
+        if ($response === false) {
+            writeLog(curl_errno($curl) . ': ' . curl_error($curl), '失败', 'curl', 1);
+        }
     }
 
     // 如果传入了 $curl 参数则不释放
