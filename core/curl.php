@@ -44,9 +44,26 @@ function CurlDELETE($payload, $url, $cookie = null, $referer = null, $header = a
 function Curl($payload, $url, $cookie = null, $referer = null, $header = array(), $setopt = array(), $UserAgent = 'MiraiEz', &$curl = null)
 {
     $header = is_array($header) ? $header : array($header);
+
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);  // 返回数据不直接显示
+
+    // 关闭 SSL
+    // curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    // curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+
+    // 设置信任证书
+    curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . '/../config/curl-ca-bundle.crt');
+    
+    // 适配 gzip 压缩
+    curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
+
     curl_setopt($curl, CURLOPT_USERAGENT, $UserAgent ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36');
+    if (!empty($referer)) curl_setopt($curl, CURLOPT_REFERER, $referer);
+    if (!empty($cookie)) curl_setopt($curl, CURLOPT_COOKIE, $cookie);
+    if (!empty($payload)) curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+
     if (!empty($header)) {
         // KV 数组转数字索引
         foreach ($header as $key => $value) {
@@ -57,21 +74,6 @@ function Curl($payload, $url, $cookie = null, $referer = null, $header = array()
         }
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     }
-    if (!empty($referer)) curl_setopt($curl, CURLOPT_REFERER, $referer);
-    if (!empty($cookie)) curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-    if (!empty($payload)) curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-
-    // 关闭 SSL
-    // curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-    // curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-
-    // 设置信任证书
-    curl_setopt($curl, CURLOPT_CAINFO, __DIR__ . '/../config/curl-ca-bundle.crt');
-
-    // 返回数据不直接显示
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    // 适配 gzip 压缩
-    curl_setopt($curl, CURLOPT_ENCODING, 'gzip, deflate');
 
     if (!empty($setopt) && is_array($setopt)) {
         $n = count($setopt);
