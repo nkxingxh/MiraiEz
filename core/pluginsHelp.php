@@ -188,7 +188,6 @@ function getDataDir(): string
     }
     $dir = baseDir . "/data_" . str_rand(16);
     mkdir($dir);
-    define('dataDir', $dir);
     return $dir;
 }
 
