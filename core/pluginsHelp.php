@@ -34,7 +34,8 @@ function pluginsList(bool $provide_infos = false): ?array
                 'name' => $plugin['name'],
                 'author' => $plugin['author'],
                 'description' => $plugin['description'],
-                'version' => $plugin['version']
+                'version' => $plugin['version'],
+                'package' => $package
             );
         } else {
             $plugins[$current_type][$package] = $plugin['version'];
