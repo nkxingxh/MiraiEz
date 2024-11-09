@@ -36,6 +36,7 @@ jobs:
           (gc miraiez-with-php\php\php.ini) -replace ';extension=fileinfo', 'extension=fileinfo' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
           (gc miraiez-with-php\php\php.ini) -replace ';extension=mbstring', 'extension=mbstring' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
           (gc miraiez-with-php\php\php.ini) -replace ';extension=exif', 'extension=exif' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
+          (gc miraiez-with-php\php\php.ini) -replace ';extension=zip', 'extension=zip' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
 
       - name: Create startup script
         run: |
