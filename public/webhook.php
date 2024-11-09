@@ -11,7 +11,7 @@
 
 const webhook = true;
 const MIRAIEZ_RUNNING_MODE = 1;
-require_once "../loader.php";
+require_once __DIR__ . '/../loader.php';
 header('content-type: application/json');
 
 if (verifyAuthorization()) {
@@ -37,7 +37,7 @@ if (isMessage($_DATA['type'])) {
 }
 
 if (MIRAIEZ_PFA) $pfa_pluginInitTime = microtime(true);
-require_once "../plugins.php"; //插件依赖
+require_once __DIR__ . '/../plugins.php'; //插件依赖
 loadPlugins();  //加载插件
 hookRegister('checkUpdates', 'BotOnlineEvent', 'FriendMessage');    //注册检查更新函数
 
