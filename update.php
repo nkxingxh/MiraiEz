@@ -13,7 +13,8 @@ if (php_sapi_name() !== 'cli') {
     exit('请在 cli 环境中运行');
 }
 
-require_once './loader.php';
+require_once __DIR__ . '/loader.php';
+$__DIR__ = __DIR__;
 
 //选择更新版本
 echo "请选择更新分支及版本:\n  1. 发行版\n  2. 主分支\n  3. 开发分支\n  0. 取消更新\nMiraiEz > ";
@@ -66,10 +67,10 @@ function update_releases($ver = null)
         $ver = $resp['tag_name'];
     }
     //覆盖检查
-    if (file_exists('./update.zip')) {
+    if (file_exists(__DIR__ . '/update.zip')) {
         echo '发现已存在的 update.zip 是否覆盖? [Y/n]';
         if (!get_input_YesOrNo(null, true)) exit("操作已取消.\n");
-        unlink('./update.zip');
+        unlink(__DIR__ . '/update.zip');
     }
     //下载 zip 包
     $url = "https://api.github.com/repos/nkxingxh/MiraiEz/zipball/$ver";
@@ -79,7 +80,7 @@ function update_releases($ver = null)
         echo "下载更新包失败! " . (isset($return_code) ? "cURL 返回码: $return_code" : '运行 cURL 命令失败') . "\n";
         exit(-1);
     }
-    if (!file_exists('./update.zip')) {
+    if (!file_exists(__DIR__ . '/update.zip')) {
         echo "下载文件失败! 未找到 update.zip\n";
         exit(-1);
     }
@@ -87,7 +88,7 @@ function update_releases($ver = null)
     update_zip();
 }
 
-function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
+function update_zip($zip_file = __DIR__ . '/update.zip', $tmp_dir = __DIR__ . '/update_tmp')
 {
     $tmp_dir = strtolower($tmp_dir);
     echo "正在解压更新包...\n";
@@ -112,6 +113,7 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
         exit(-1);
     } else {
         $update_dir = $update_dir[0];
+        echo "更新内容目录: $update_dir\n";
     }
 
     //备份文件
@@ -119,24 +121,23 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
     $backups = array(
         //dirname(dataDir),
         'config',
-        'plugins',
-        'config.php'
+        'plugins'
     );
     mkdir("$tmp_dir/backup");
     foreach ($backups as $v) {
         if (!file_exists($v)) continue;
-        echo "[mv] ./$v $tmp_dir/backup/$v\n";
+        echo "[mv] {$GLOBALS['__DIR__']}/$v -> $tmp_dir/backup/$v\n";
         continue;   //todo.完成后移除 continue
-        if (!rename("./$v", "$tmp_dir/backup/$v")) {
+        if (!rename("{$GLOBALS['__DIR__']}/$v", "$tmp_dir/backup/$v")) {
             echo "移动文件(或目录) $v 失败!\n";
             exit(-1);
         }
     }
     //删除老文件
     echo "正在移除老文件...\n";
-    $dir_arr = glob('./*');
+    $dir_arr = glob("{$GLOBALS['__DIR__']}/*");
     foreach ($dir_arr as $v) {
-        if ($v == $tmp_dir || strtolower(substr($v, 0, 7)) == './data_') continue;
+        if ($v == $tmp_dir || strtolower(substr($v, 0, 7)) == "{$GLOBALS['__DIR__']}/data_") continue;
         //unlink($v);
         echo "[rm] $v\n";
     }
@@ -146,11 +147,11 @@ function update_zip($zip_file = './update.zip', $tmp_dir = './update_tmp')
     $update_dir_len = strlen($update_dir);
     foreach ($update_arr as $v) {
         $fn = substr($v, -(strlen($v) - $update_dir_len - 1));
-        //rename($v, "./$fn");
-        echo "[mv] $v ./$fn\n";
+        //rename($v, "{$GLOBALS['__DIR__']}/$fn");
+        echo "[mv] $v -> {$GLOBALS['__DIR__']}/$fn\n";
     }
 
-    unlink('./update.zip');
+    unlink("{$GLOBALS['__DIR__']}/update.zip");
     unlink($tmp_dir);
 }
 
