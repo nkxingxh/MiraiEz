@@ -47,7 +47,8 @@ jobs:
       #     Compress-Archive -Path miraiez-with-php -DestinationPath miraiez-with-php.zip
           
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MiraiEz-With-PHP-win64
           path: miraiez-with-php
+          compression-level: 9
