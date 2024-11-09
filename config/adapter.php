@@ -9,6 +9,6 @@
  * Github: https://github.com/nkxingxh/MiraiEz
  */
 
-const MIRAIEZ_HTTP_API = "http://192.168.6.3:90";           //http api
-const MIRAIEZ_HTTP_KEY = "tOoNq37JrBfd631W";                //http api MIRAIEZ_HTTP_KEY
-const MIRAIEZ_WEBHOOK_AUTH = "";                            //webhook MIRAIEZ_WEBHOOK_AUTH
+const MIRAIEZ_HTTP_API = "http://127.0.0.1:8001";           // mirai-api-http 的 HTTP 适配器地址
+const MIRAIEZ_HTTP_KEY = "xxxxxxxxxxxxxxxx";                // mirai-api-http 的 verifyKey
+const MIRAIEZ_WEBHOOK_AUTH = "xxxxxxxxxxxxxxxx";            // 需要和 webhook 适配器的 Authorization 一致
