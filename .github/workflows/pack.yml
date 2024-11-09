@@ -31,23 +31,23 @@ jobs:
       - name: Configure PHP
         run: |
           copy miraiez-with-php\php\php.ini-development miraiez-with-php\php\php.ini
-          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension_dir = \"ext\"', 'extension_dir = \"ext\"' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
-          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=curl', 'extension=curl' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
-          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=fileinfo', 'extension=fileinfo' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
-          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=mbstring', 'extension=mbstring' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
-          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=exif', 'extension=exif' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+          (gc miraiez-with-php\php\php.ini) -replace ';extension_dir = "ext"', 'extension_dir = "ext"' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
+          (gc miraiez-with-php\php\php.ini) -replace ';extension=curl', 'extension=curl' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
+          (gc miraiez-with-php\php\php.ini) -replace ';extension=fileinfo', 'extension=fileinfo' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
+          (gc miraiez-with-php\php\php.ini) -replace ';extension=mbstring', 'extension=mbstring' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
+          (gc miraiez-with-php\php\php.ini) -replace ';extension=exif', 'extension=exif' | Out-File -encoding ASCII miraiez-with-php\php\php.ini
 
       - name: Create startup script
         run: |
-          echo @echo off > miraiez-with-php\start.bat
-          echo php\php.exe -S localhost:8000 -t miraiez\public >> miraiez-with-php\start.bat
+          echo "@echo off" > miraiez-with-php\start.bat
+          echo "php\php.exe -S localhost:8000 -t miraiez\public" >> miraiez-with-php\start.bat
 
-      - name: Package the final product
-        run: |
-          Compress-Archive -Path miraiez-with-php -DestinationPath miraiez-with-php.zip
+      # - name: Package the final product
+      #   run: |
+      #     Compress-Archive -Path miraiez-with-php -DestinationPath miraiez-with-php.zip
           
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: miraiez-with-php
-          path: miraiez-with-php.zip
+          name: MiraiEz-With-PHP-win64
+          path: miraiez-with-php
