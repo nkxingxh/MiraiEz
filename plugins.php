@@ -191,8 +191,8 @@ function pluginRegister(Object $pluginObject): bool
  */
 function initPlugins()
 {
-    global $_plugins, $_plugins_count_load;
-    foreach ($_plugins as /* $package => */ &$plugin) {
+    global $_plugins, $__pluginPackage__, $_plugins_count_load;
+    foreach ($_plugins as $__pluginPackage__ => &$plugin) {
         // 判断是否未初始化状态
         if (isset($plugin['object']) && is_object($plugin['object']) && $plugin['hooked'] === null) {
             $plugin['hooked'] = array();
@@ -266,8 +266,8 @@ function execPluginsFunction(): int
     global $__pluginPackage__;                          //当前正在执行的插件
     foreach ($_plugins as &$__plugin__) {            //遍历已注册的插件列表
         if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) { //判断是否已挂钩
-            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);   //判断插件是否为对象
-            $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : "pluginParent";
+            $inObject = is_object($__plugin__['object'] ?? null);   //判断插件是否为对象
+            $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : pluginParent::_pluginPackage;
             foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
                 $_plugins_count_exec++;                               //计数器加1
                 if ($inObject && is_string($__hooked_func__)) { //判断插件对象是否存在
