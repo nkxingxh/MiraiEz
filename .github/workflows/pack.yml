@@ -1,0 +1,53 @@
+name: Build and Package Miraiez with PHP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-package:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          path: miraiez-with-php/miraiez
+
+      - name: Create php directory
+        run: |
+          mkdir miraiez-with-php\php
+
+      - name: Download PHP
+        run: |
+          curl -L -o php.zip https://windows.php.net/downloads/releases/php-8.3.13-nts-Win32-vs16-x64.zip
+
+      - name: Extract PHP to php directory inside miraiez-with-php
+        run: |
+          unzip php.zip -d miraiez-with-php\php
+
+      - name: Configure PHP
+        run: |
+          copy miraiez-with-php\php\php.ini-development miraiez-with-php\php\php.ini
+          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension_dir = \"ext\"', 'extension_dir = \"ext\"' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=curl', 'extension=curl' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=fileinfo', 'extension=fileinfo' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=mbstring', 'extension=mbstring' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+          powershell -Command "(gc miraiez-with-php\php\php.ini) -replace ';extension=exif', 'extension=exif' | Out-File -encoding ASCII miraiez-with-php\php\php.ini"
+
+      - name: Create startup script
+        run: |
+          echo @echo off > miraiez-with-php\start.bat
+          echo php\php.exe -S localhost:8000 -t miraiez\public >> miraiez-with-php\start.bat
+
+      - name: Package the final product
+        run: |
+          Compress-Archive -Path miraiez-with-php -DestinationPath miraiez-with-php.zip
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: miraiez-with-php
+          path: miraiez-with-php.zip
