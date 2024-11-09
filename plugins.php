@@ -20,9 +20,7 @@ class pluginParent
     const _pluginFrontLib = false;
 
     //构造函数
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     //初始化插件
     public function _init()
@@ -85,9 +83,11 @@ function loadPlugins(string $dir = 'plugins')
         }, ...$types);
     };
 
+    // 注册一个空插件，用于挂钩全局函数 (兼容 v1 插件)
     $GLOBALS['__pluginFile__'] = "plugins.php";
-    pluginRegister(new pluginParent);           //注册一个空插件，用于挂钩全局函数 (兼容 v1 插件)
-    unset($_plugins[pluginParent::_pluginPackage]['object']); //删除空插件对象, 使得执行挂钩函数时在全局寻找
+    pluginRegister(new pluginParent);
+    // 删除空插件对象, 使得执行挂钩函数时在全局寻找 (移动到 initPlugins() 之后)
+    // unset($_plugins[pluginParent::_pluginPackage]['object']); 
 
     //if (defined('mdm_cli')) echo "开始遍历插件目录...\n";
     //遍历所有插件文件
@@ -108,6 +108,12 @@ function loadPlugins(string $dir = 'plugins')
             //if (defined('mdm_cli')) echo "不是文件\n";
         }
     }
+
+    // 初始化插件
+    initPlugins();
+    // 删除 pluginParent 插件对象, 使得执行挂钩函数时在全局寻找
+    unset($_plugins[pluginParent::_pluginPackage]['object']); 
+
     unset($GLOBALS['__pluginFile__'], $GLOBALS['__pluginPackage__'], $_plugins_files);
     //if (defined('mdm_cli')) echo "加载结束\n";
     hookRegister('MiraiEzHook', 'FriendMessage');
@@ -144,30 +150,66 @@ function pluginRegister(Object $pluginObject): bool
         'hooked' => null
     );
     if (pluginIsEnable($__pluginPackage__, $GLOBALS['__pluginFile__'])) {
-        $_plugins[$__pluginPackage__]['hooked'] = array();
+        // $_plugins[$__pluginPackage__]['hooked'] = array();
         $_plugins[$__pluginPackage__]['object'] = $pluginObject;
         if ($__pluginPackage__ === pluginParent::_pluginPackage && is_callable($GLOBALS['_MiraiEz_TL'])) {
             $types = array('BotOnlineEvent', 'BotOfflineEventActive', 'BotOfflineEventForce', 'BotOfflineEventDropped', 'BotReloginEvent');
             $GLOBALS['_MiraiEz_TL']($types);
             unset($GLOBALS['_MiraiEz_TL'], $types);
         }
-        //初始化插件
-        if ($pluginObject->_init() === false) {                      //插件初始化失败
-            $_plugins[$__pluginPackage__]['hooked'] = false;
+
+        // 初始化状态
+        // object为对象 且 hooked=null 表示插件待初始化
+        $_plugins[$__pluginPackage__]['hooked'] = null;
+
+        //初始化插件 (已经移动到 initPlugins 函数)
+        /* if ($pluginObject->_init() === false) {
+            // 插件初始化失败
+            // object=null 且 hooked=false 表示插件初始化失败
             $_plugins[$__pluginPackage__]['object'] = null;
+            $_plugins[$__pluginPackage__]['hooked'] = false;
+            unset($pluginObject);
         } else {
             //计数器
             $_plugins_count_load++;
             //移动到 _init() 前，使得 init 阶段的插件有更多操作空间
             // $_plugins[$__pluginPackage__]['object'] = $pluginObject;   //插件初始化成功
             return true;
-        }
+        } */
     } else {
-        //插件未启用
+        // 插件未启用
+        // object=false 且 hooked=null 表示插件未启用
         $_plugins[$__pluginPackage__]['object'] = false;
         $_plugins[$__pluginPackage__]['hooked'] = null;
+        unset($pluginObject);
     }
     return false;
+}
+
+/**
+ * 初始化已经调用 pluginRegister 的插件
+ */
+function initPlugins()
+{
+    global $_plugins, $_plugins_count_load;
+    foreach ($_plugins as /* $package => */ &$plugin) {
+        // 判断是否未初始化状态
+        if (isset($plugin['object']) && is_object($plugin['object']) && $plugin['hooked'] === null) {
+            $plugin['hooked'] = array();
+            if ($plugin['object']->_init() === false) {
+                // 插件初始化失败
+                // object=null 且 hooked=false 表示插件初始化失败
+                $plugin['object'] = null;
+                $plugin['hooked'] = false;
+                unset($pluginObject);
+            } else {
+                //计数器
+                $_plugins_count_load++;
+                // 移动到 _init() 前，使得 init 阶段的插件有更多操作空间
+                // $_plugins[$__pluginPackage__]['object'] = $pluginObject;   //插件初始化成功
+            }
+        }
+    }
 }
 
 /**
@@ -224,7 +266,7 @@ function execPluginsFunction(): int
     global $__pluginPackage__;                          //当前正在执行的插件
     foreach ($_plugins as &$__plugin__) {            //遍历已注册的插件列表
         if (!empty($__plugin__['hooked']) && is_array($__plugin__['hooked'])) { //判断是否已挂钩
-            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);   //判断插件是否为 类
+            $inObject = isset($__plugin__['object']) && is_object($__plugin__['object']);   //判断插件是否为对象
             $__pluginPackage__ = $inObject ? $__plugin__['object']::_pluginPackage : "pluginParent";
             foreach ($__plugin__['hooked'] as $__hooked_func__) {          //遍历挂钩函数列表
                 $_plugins_count_exec++;                               //计数器加1

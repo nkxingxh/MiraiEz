@@ -15,18 +15,24 @@
 function pluginsList(bool $provide_infos = false): ?array
 {
     $plugins = array(
-        'active' => array(),
-        'failed' => array(),
-        'disabled' => array()
+        'loaded' => array(),    // 已加载但未初始化的插件
+        'active' => array(),    // 已加载并激活的插件
+        'failed' => array(),    // 初始化失败的插件
+        'disabled' => array()   // 已停用的插件
     );
     if (!isset($GLOBALS['_plugins'])) return null;
     foreach ($GLOBALS['_plugins'] as $package => $plugin) {
-        //未启用
-        if (isset($plugin['object']) && $plugin['object'] === false) {
+        if (is_object($plugin['object'] ?? null) && $plugin['hooked'] === null) {
+            // 未初始化
+            $current_type = 'loaded';
+        } elseif (($plugin['object'] ?? null) === false) {
+            // 未启用
             $current_type = 'disabled';
-        } elseif ($plugin['hooked'] === false) {
+        } elseif (($plugin['hooked'] ?? null) === false) {
+            // 加载失败
             $current_type = 'failed';
         } else {
+            // 正常插件
             $current_type = 'active';
         }
         if ($provide_infos) {
